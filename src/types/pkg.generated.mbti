@@ -1,0 +1,457 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "f4ah6o/simple-webauthn/types"
+
+import {
+  "moonbitlang/core/json",
+}
+
+// Values
+
+// Errors
+pub(all) suberror WebAuthnError {
+  InvalidBase64URL(String)
+  InvalidAuthenticatorData(String)
+  InvalidClientDataJSON(String)
+  InvalidAttestationObject(String)
+  InvalidCOSEKey(String)
+  SignatureVerificationFailed(String)
+  ChallengeMismatch
+  OriginMismatch(expected~ : String, actual~ : String)
+  RpIdMismatch(expected~ : String, actual~ : String)
+  UserVerificationRequired
+  CounterTooLow(expected~ : UInt, actual~ : UInt)
+  UnsupportedAttestationFormat(String)
+  WebAuthnNotSupported
+  UserCancelled
+  Timeout
+  Unknown(String)
+}
+pub impl Show for WebAuthnError
+
+// Types and methods
+pub(all) enum AttestationConveyance {
+  None
+  Indirect
+  Direct
+  Enterprise
+}
+pub fn AttestationConveyance::from_string(String) -> Self?
+pub fn AttestationConveyance::to_string(Self) -> String
+pub impl Eq for AttestationConveyance
+pub impl Show for AttestationConveyance
+pub impl ToJson for AttestationConveyance
+pub impl @json.FromJson for AttestationConveyance
+
+pub(all) enum AttestationFormat {
+  None
+  Packed
+  FidoU2f
+  AndroidKey
+  AndroidSafetynet
+  Tpm
+  Apple
+}
+pub fn AttestationFormat::from_string(String) -> Self?
+pub fn AttestationFormat::to_string(Self) -> String
+pub impl Eq for AttestationFormat
+pub impl Show for AttestationFormat
+pub impl ToJson for AttestationFormat
+
+pub struct AuthenticationInfo {
+  credential_id : Bytes
+  new_counter : UInt
+  credential_device_type : CredentialDeviceType
+  credential_backed_up : Bool
+  origin : String
+  rp_id_hash : Bytes
+}
+pub impl Eq for AuthenticationInfo
+pub impl Show for AuthenticationInfo
+
+pub struct AuthenticationResponseJSON {
+  id : Base64URLString
+  raw_id : Base64URLString
+  response : AuthenticatorAssertionResponseJSON
+  authenticator_attachment : AuthenticatorAttachment?
+  client_extension_results : Json
+  type_ : PublicKeyCredentialType
+}
+pub impl Eq for AuthenticationResponseJSON
+pub impl Show for AuthenticationResponseJSON
+pub impl ToJson for AuthenticationResponseJSON
+pub impl @json.FromJson for AuthenticationResponseJSON
+
+pub struct AuthenticatorAssertionResponseJSON {
+  client_data_json : Base64URLString
+  authenticator_data : Base64URLString
+  signature : Base64URLString
+  user_handle : Base64URLString?
+}
+pub impl Eq for AuthenticatorAssertionResponseJSON
+pub impl Show for AuthenticatorAssertionResponseJSON
+pub impl ToJson for AuthenticatorAssertionResponseJSON
+pub impl @json.FromJson for AuthenticatorAssertionResponseJSON
+
+pub(all) enum AuthenticatorAttachment {
+  Platform
+  CrossPlatform
+}
+pub fn AuthenticatorAttachment::from_string(String) -> Self?
+pub fn AuthenticatorAttachment::to_string(Self) -> String
+pub impl Eq for AuthenticatorAttachment
+pub impl Show for AuthenticatorAttachment
+pub impl ToJson for AuthenticatorAttachment
+pub impl @json.FromJson for AuthenticatorAttachment
+
+pub struct AuthenticatorAttestationResponseJSON {
+  client_data_json : Base64URLString
+  attestation_object : Base64URLString
+  authenticator_data : Base64URLString?
+  transports : Array[AuthenticatorTransport]?
+  public_key_algorithm : COSEAlgorithm?
+  public_key : Base64URLString?
+}
+pub impl Eq for AuthenticatorAttestationResponseJSON
+pub impl Show for AuthenticatorAttestationResponseJSON
+pub impl ToJson for AuthenticatorAttestationResponseJSON
+pub impl @json.FromJson for AuthenticatorAttestationResponseJSON
+
+pub struct AuthenticatorFlags {
+  up : Bool
+  uv : Bool
+  be : Bool
+  bs : Bool
+  at : Bool
+  ed : Bool
+  raw : Byte
+}
+pub fn AuthenticatorFlags::credential_backed_up(Self) -> Bool
+pub fn AuthenticatorFlags::credential_device_type(Self) -> CredentialDeviceType
+pub impl Eq for AuthenticatorFlags
+pub impl Show for AuthenticatorFlags
+
+pub struct AuthenticatorSelectionCriteria {
+  authenticator_attachment : AuthenticatorAttachment?
+  resident_key : ResidentKey?
+  require_resident_key : Bool?
+  user_verification : UserVerification?
+}
+pub impl Eq for AuthenticatorSelectionCriteria
+pub impl Show for AuthenticatorSelectionCriteria
+pub impl ToJson for AuthenticatorSelectionCriteria
+pub impl @json.FromJson for AuthenticatorSelectionCriteria
+
+pub(all) enum AuthenticatorTransport {
+  Ble
+  Cable
+  Hybrid
+  Internal
+  Nfc
+  SmartCard
+  Usb
+}
+pub fn AuthenticatorTransport::from_string(String) -> Self?
+pub fn AuthenticatorTransport::to_string(Self) -> String
+pub impl Eq for AuthenticatorTransport
+pub impl Show for AuthenticatorTransport
+pub impl ToJson for AuthenticatorTransport
+pub impl @json.FromJson for AuthenticatorTransport
+
+pub struct Base64URLString {
+  value : String
+}
+pub fn Base64URLString::new(String) -> Self
+pub fn Base64URLString::to_string(Self) -> String
+pub impl Eq for Base64URLString
+pub impl Show for Base64URLString
+pub impl ToJson for Base64URLString
+pub impl @json.FromJson for Base64URLString
+
+pub(all) enum COSEAlgorithm {
+  ES256
+  EdDSA
+  ES384
+  ES512
+  PS256
+  PS384
+  PS512
+  ES256K
+  RS256
+  RS384
+  RS512
+  RS1
+}
+pub fn COSEAlgorithm::from_int(Int) -> Self?
+pub fn COSEAlgorithm::to_int(Self) -> Int
+pub impl Eq for COSEAlgorithm
+pub impl Show for COSEAlgorithm
+pub impl ToJson for COSEAlgorithm
+pub impl @json.FromJson for COSEAlgorithm
+
+pub(all) enum COSECurve {
+  P256
+  P384
+  P521
+  Ed25519
+  Secp256k1
+}
+pub fn COSECurve::from_int(Int) -> Self?
+pub fn COSECurve::to_int(Self) -> Int
+pub impl Eq for COSECurve
+pub impl Show for COSECurve
+
+pub(all) enum COSEKeyType {
+  OKP
+  EC2
+  RSA
+}
+pub fn COSEKeyType::from_int(Int) -> Self?
+pub fn COSEKeyType::to_int(Self) -> Int
+pub impl Eq for COSEKeyType
+pub impl Show for COSEKeyType
+
+pub(all) enum COSEPublicKey {
+  OKP(COSEPublicKeyOKP)
+  EC2(COSEPublicKeyEC2)
+  RSA(COSEPublicKeyRSA)
+}
+pub fn COSEPublicKey::algorithm(Self) -> COSEAlgorithm
+pub fn COSEPublicKey::key_type(Self) -> COSEKeyType
+pub impl Eq for COSEPublicKey
+pub impl Show for COSEPublicKey
+
+pub struct COSEPublicKeyEC2 {
+  kty : COSEKeyType
+  alg : COSEAlgorithm
+  crv : COSECurve
+  x : Bytes
+  y : Bytes
+}
+pub impl Eq for COSEPublicKeyEC2
+pub impl Show for COSEPublicKeyEC2
+
+pub struct COSEPublicKeyOKP {
+  kty : COSEKeyType
+  alg : COSEAlgorithm
+  crv : COSECurve
+  x : Bytes
+}
+pub impl Eq for COSEPublicKeyOKP
+pub impl Show for COSEPublicKeyOKP
+
+pub struct COSEPublicKeyRSA {
+  kty : COSEKeyType
+  alg : COSEAlgorithm
+  n : Bytes
+  e : Bytes
+}
+pub impl Eq for COSEPublicKeyRSA
+pub impl Show for COSEPublicKeyRSA
+
+pub(all) enum CredentialDeviceType {
+  SingleDevice
+  MultiDevice
+}
+pub fn CredentialDeviceType::to_string(Self) -> String
+pub impl Eq for CredentialDeviceType
+pub impl Show for CredentialDeviceType
+pub impl ToJson for CredentialDeviceType
+
+pub struct ParsedAttestationObject {
+  fmt : AttestationFormat
+  att_stmt : Json
+  auth_data : Bytes
+}
+pub impl Eq for ParsedAttestationObject
+pub impl Show for ParsedAttestationObject
+
+pub struct ParsedAuthenticatorData {
+  rp_id_hash : Bytes
+  flags : AuthenticatorFlags
+  counter : UInt
+  aaguid : Bytes?
+  credential_id : Bytes?
+  credential_public_key : Bytes?
+  extensions_data : Json?
+}
+pub impl Eq for ParsedAuthenticatorData
+pub impl Show for ParsedAuthenticatorData
+
+pub struct ParsedClientDataJSON {
+  type_ : String
+  challenge : Base64URLString
+  origin : String
+  cross_origin : Bool?
+  token_binding : Json?
+}
+pub impl Eq for ParsedClientDataJSON
+pub impl Show for ParsedClientDataJSON
+
+pub struct PublicKeyCredentialCreationOptionsJSON {
+  rp : RelyingParty
+  user : PublicKeyCredentialUserEntity
+  challenge : Base64URLString
+  pub_key_cred_params : Array[PublicKeyCredentialParameters]
+  timeout : Int?
+  exclude_credentials : Array[PublicKeyCredentialDescriptor]?
+  authenticator_selection : AuthenticatorSelectionCriteria?
+  hints : Array[PublicKeyCredentialHint]?
+  attestation : AttestationConveyance?
+  attestation_formats : Array[AttestationFormat]?
+  extensions : Json?
+}
+pub impl Eq for PublicKeyCredentialCreationOptionsJSON
+pub impl Show for PublicKeyCredentialCreationOptionsJSON
+pub impl ToJson for PublicKeyCredentialCreationOptionsJSON
+pub impl @json.FromJson for PublicKeyCredentialCreationOptionsJSON
+
+pub struct PublicKeyCredentialDescriptor {
+  id : Base64URLString
+  type_ : PublicKeyCredentialType
+  transports : Array[AuthenticatorTransport]?
+}
+pub impl Eq for PublicKeyCredentialDescriptor
+pub impl Show for PublicKeyCredentialDescriptor
+pub impl ToJson for PublicKeyCredentialDescriptor
+pub impl @json.FromJson for PublicKeyCredentialDescriptor
+
+pub(all) enum PublicKeyCredentialHint {
+  Hybrid
+  SecurityKey
+  ClientDevice
+}
+pub fn PublicKeyCredentialHint::from_string(String) -> Self?
+pub fn PublicKeyCredentialHint::to_string(Self) -> String
+pub impl Eq for PublicKeyCredentialHint
+pub impl Show for PublicKeyCredentialHint
+pub impl ToJson for PublicKeyCredentialHint
+pub impl @json.FromJson for PublicKeyCredentialHint
+
+pub struct PublicKeyCredentialParameters {
+  type_ : PublicKeyCredentialType
+  alg : COSEAlgorithm
+}
+pub impl Eq for PublicKeyCredentialParameters
+pub impl Show for PublicKeyCredentialParameters
+pub impl ToJson for PublicKeyCredentialParameters
+pub impl @json.FromJson for PublicKeyCredentialParameters
+
+pub struct PublicKeyCredentialRequestOptionsJSON {
+  challenge : Base64URLString
+  timeout : Int?
+  rp_id : String?
+  allow_credentials : Array[PublicKeyCredentialDescriptor]?
+  user_verification : UserVerification?
+  hints : Array[PublicKeyCredentialHint]?
+  extensions : Json?
+}
+pub impl Eq for PublicKeyCredentialRequestOptionsJSON
+pub impl Show for PublicKeyCredentialRequestOptionsJSON
+pub impl ToJson for PublicKeyCredentialRequestOptionsJSON
+pub impl @json.FromJson for PublicKeyCredentialRequestOptionsJSON
+
+pub(all) enum PublicKeyCredentialType {
+  PublicKey
+}
+pub fn PublicKeyCredentialType::from_string(String) -> Self?
+pub fn PublicKeyCredentialType::to_string(Self) -> String
+pub impl Eq for PublicKeyCredentialType
+pub impl Show for PublicKeyCredentialType
+pub impl ToJson for PublicKeyCredentialType
+pub impl @json.FromJson for PublicKeyCredentialType
+
+pub struct PublicKeyCredentialUserEntity {
+  id : String
+  name : String
+  display_name : String
+}
+pub impl Eq for PublicKeyCredentialUserEntity
+pub impl Show for PublicKeyCredentialUserEntity
+pub impl ToJson for PublicKeyCredentialUserEntity
+pub impl @json.FromJson for PublicKeyCredentialUserEntity
+
+pub struct RegistrationInfo {
+  credential_id : Bytes
+  credential_public_key : Bytes
+  counter : UInt
+  credential_device_type : CredentialDeviceType
+  credential_backed_up : Bool
+  aaguid : String
+  attestation_format : AttestationFormat
+}
+pub impl Eq for RegistrationInfo
+pub impl Show for RegistrationInfo
+
+pub struct RegistrationResponseJSON {
+  id : Base64URLString
+  raw_id : Base64URLString
+  response : AuthenticatorAttestationResponseJSON
+  authenticator_attachment : AuthenticatorAttachment?
+  client_extension_results : Json
+  type_ : PublicKeyCredentialType
+}
+pub impl Eq for RegistrationResponseJSON
+pub impl Show for RegistrationResponseJSON
+pub impl ToJson for RegistrationResponseJSON
+pub impl @json.FromJson for RegistrationResponseJSON
+
+pub struct RelyingParty {
+  id : String?
+  name : String
+}
+pub impl Eq for RelyingParty
+pub impl Show for RelyingParty
+pub impl ToJson for RelyingParty
+pub impl @json.FromJson for RelyingParty
+
+pub(all) enum ResidentKey {
+  Discouraged
+  Preferred
+  Required
+}
+pub fn ResidentKey::from_string(String) -> Self?
+pub fn ResidentKey::to_string(Self) -> String
+pub impl Eq for ResidentKey
+pub impl Show for ResidentKey
+pub impl ToJson for ResidentKey
+pub impl @json.FromJson for ResidentKey
+
+pub(all) enum UserVerification {
+  Required
+  Preferred
+  Discouraged
+}
+pub fn UserVerification::from_string(String) -> Self?
+pub fn UserVerification::to_string(Self) -> String
+pub impl Eq for UserVerification
+pub impl Show for UserVerification
+pub impl ToJson for UserVerification
+pub impl @json.FromJson for UserVerification
+
+pub struct VerifiedAuthenticationResponse {
+  verified : Bool
+  authentication_info : AuthenticationInfo?
+}
+pub impl Eq for VerifiedAuthenticationResponse
+pub impl Show for VerifiedAuthenticationResponse
+
+pub struct VerifiedRegistrationResponse {
+  verified : Bool
+  registration_info : RegistrationInfo?
+}
+pub impl Eq for VerifiedRegistrationResponse
+pub impl Show for VerifiedRegistrationResponse
+
+pub struct WebAuthnCredential {
+  id : Base64URLString
+  public_key : Bytes
+  counter : UInt
+  transports : Array[AuthenticatorTransport]?
+}
+pub impl Eq for WebAuthnCredential
+pub impl Show for WebAuthnCredential
+
+// Type aliases
+
+// Traits
+
