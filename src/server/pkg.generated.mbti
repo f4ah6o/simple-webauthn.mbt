@@ -1,0 +1,63 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "f4ah6o/simple-webauthn/server"
+
+import {
+  "f4ah6o/simple-webauthn/helpers",
+}
+
+// Values
+pub fn verify_registration_response(Bytes, Bytes, VerifyRegistrationOptions) -> VerifiedRegistration raise RegistrationVerifyError
+
+pub fn verify_registration_response_b64(String, String, VerifyRegistrationOptions) -> VerifiedRegistration raise RegistrationVerifyError
+
+// Errors
+pub suberror RegistrationVerifyError {
+  InvalidClientDataType(String)
+  ChallengeMismatch(String)
+  OriginMismatch(String)
+  RpIdHashMismatch(String)
+  UserNotPresent
+  UserVerificationRequired
+  AttestedCredentialDataMissing
+  InvalidCredentialId(String)
+  InvalidPublicKey(String)
+  UnsupportedAttestationFormat(String)
+  AttestationSignatureInvalid(String)
+  SignatureVerificationNotImplemented
+  ClientDataParseError(String)
+  AttestationObjectParseError(String)
+  Base64DecodeError(String)
+  ValidationError(String)
+}
+
+// Types and methods
+pub struct VerifiedRegistration {
+  credential_id : Bytes
+  credential_public_key : Bytes
+  credential_algorithm : Int
+  sign_count : UInt
+  backup_eligible : Bool
+  backup_state : Bool
+  aaguid : Bytes
+  attestation_format : @helpers.AttestationFormat
+  attestation_verified : Bool
+}
+pub impl Eq for VerifiedRegistration
+pub impl Show for VerifiedRegistration
+
+pub struct VerifyRegistrationOptions {
+  expected_challenge : Bytes
+  expected_origins : Array[String]
+  expected_rp_id : String
+  require_user_verification : Bool
+}
+pub fn VerifyRegistrationOptions::new(Bytes, String, String) -> Self
+pub fn VerifyRegistrationOptions::require_user_verification(Self, Bool) -> Self
+pub fn VerifyRegistrationOptions::with_origins(Bytes, Array[String], String) -> Self
+pub impl Eq for VerifyRegistrationOptions
+pub impl Show for VerifyRegistrationOptions
+
+// Type aliases
+
+// Traits
+
