@@ -1,0 +1,5 @@
+import {
+  "f4ah6o/simple-webauthn/types" as @types,
+  "f4ah6o/simple-webauthn/helpers" as @helpers,
+  "mizchi/js",
+}
