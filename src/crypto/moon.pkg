@@ -1,0 +1,9 @@
+import {
+  "f4ah6o/simple-webauthn/types" as @types,
+  "f4ah6o/simple-webauthn/helpers" as @helpers,
+  "moonbitlang/x/crypto" as @xcrypto,
+  "moonbitlang/x/encoding" as @encoding,
+  "mizchi/cbor",
+  "mizchi/js/core" as @js,
+  "moonbitlang/async",
+}

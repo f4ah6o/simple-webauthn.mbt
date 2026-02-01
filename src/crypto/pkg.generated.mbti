@@ -1,0 +1,49 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "f4ah6o/simple-webauthn/crypto"
+
+// Values
+pub fn create_signed_data(Bytes, Bytes) -> Bytes
+
+pub fn es256_algorithm() -> Int
+
+pub fn hash_client_data_json(Bytes) -> Bytes
+
+pub fn hash_rp_id(String) -> Bytes
+
+pub fn is_es256(Int) -> Bool
+
+pub fn normalize_signature(Bytes) -> Bytes raise ECDSAError
+
+pub fn parse_cose_ec2_key(Bytes) -> EC2PublicKey raise ECDSAError
+
+pub fn sha256(Bytes) -> Bytes
+
+pub fn sha256_string(String) -> Bytes
+
+pub fn to_uncompressed_public_key(EC2PublicKey) -> Bytes
+
+pub fn verify_es256_sync(EC2PublicKey, Bytes, Bytes) -> Bool
+
+pub fn verify_rp_id_hash(Bytes, String) -> Bool
+
+// Errors
+pub suberror ECDSAError {
+  InvalidPublicKey(String)
+  InvalidSignature(String)
+  VerificationFailed(String)
+  UnsupportedAlgorithm(Int)
+}
+
+// Types and methods
+pub struct EC2PublicKey {
+  x : Bytes
+  y : Bytes
+  alg : Int
+}
+pub impl Eq for EC2PublicKey
+pub impl Show for EC2PublicKey
+
+// Type aliases
+
+// Traits
+
