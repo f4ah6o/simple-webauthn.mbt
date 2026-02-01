@@ -1,0 +1,193 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "f4ah6o/simple-webauthn/helpers"
+
+import {
+  "f4ah6o/simple-webauthn/types",
+  "mizchi/cbor",
+}
+
+// Values
+pub fn base64url_decode(String) -> Bytes raise Base64URLError
+
+pub fn base64url_encode(Bytes) -> String
+
+pub fn bytes_concat(Array[Bytes]) -> Bytes
+
+pub fn bytes_slice(Bytes, Int, Int) -> Bytes raise BytesError
+
+pub fn bytes_slice_from(Bytes, Int) -> Bytes raise BytesError
+
+pub fn bytes_starts_with(Bytes, Bytes) -> Bool
+
+pub fn bytes_to_hex(Bytes) -> String
+
+pub fn constant_time_equal(Bytes, Bytes) -> Bool
+
+pub fn decode_base64url_string(@types.Base64URLString) -> Bytes raise Base64URLError
+
+pub fn encode_to_base64url_string(Bytes) -> @types.Base64URLString
+
+pub fn get_auth_data(AttestationObject) -> AuthenticatorData
+
+pub fn get_auth_data_raw(AttestationObject) -> Bytes
+
+pub fn get_credential_id(AuthenticatorData) -> Bytes?
+
+pub fn get_credential_id_from_attestation(AttestationObject) -> Bytes?
+
+pub fn get_credential_public_key(AuthenticatorData) -> Bytes?
+
+pub fn get_format(AttestationObject) -> AttestationFormat
+
+pub fn get_public_key_from_attestation(AttestationObject) -> Bytes?
+
+pub fn hex_to_bytes(String) -> Bytes raise BytesError
+
+pub fn is_backup_eligible(AuthenticatorData) -> Bool
+
+pub fn is_none_attestation(AttestationObject) -> Bool
+
+pub fn is_user_present(AuthenticatorData) -> Bool
+
+pub fn is_user_verified(AuthenticatorData) -> Bool
+
+pub fn parse_attestation_object(Bytes) -> AttestationObject raise AttestationObjectError
+
+pub fn parse_attestation_object_base64url(@types.Base64URLString) -> AttestationObject raise
+
+pub fn parse_auth_flags(Byte) -> AuthFlags
+
+pub fn parse_authenticator_data(Bytes) -> AuthenticatorData raise AuthenticatorDataError
+
+pub fn parse_client_data_json(String) -> ClientData raise ClientDataError
+
+pub fn parse_client_data_json_string(String) -> ClientData raise ClientDataError
+
+pub fn parse_client_data_json_value(Json) -> ClientData raise ClientDataError
+
+pub fn read_u16_be(Bytes, Int) -> UInt raise BytesError
+
+pub fn read_u32_be(Bytes, Int) -> UInt raise BytesError
+
+pub fn read_u64_be(Bytes, Int) -> UInt64 raise BytesError
+
+pub fn verify_client_data(ClientData, ClientDataType, Bytes, String) -> Bool
+
+pub fn verify_rp_id_hash(AuthenticatorData, String) -> Bool
+
+// Errors
+pub suberror AttestationObjectError {
+  CborDecodeError(String)
+  InvalidFormat(String)
+  MissingField(String)
+  InvalidAuthData(String)
+}
+
+pub suberror AuthenticatorDataError {
+  TooShort(Int, Int)
+  InvalidFlags(Byte)
+  InvalidAAGUID
+  InvalidCredentialId
+  InvalidPublicKey(String)
+  CborDecodeError(String)
+}
+
+pub suberror Base64URLError {
+  InvalidChar(Int)
+  InvalidPadding
+  InvalidLength
+  DecodeFailed(String)
+}
+
+pub suberror BytesError {
+  OutOfBounds(Int, Int)
+  InvalidLength(Int, Int)
+}
+
+pub suberror ClientDataError {
+  InvalidJson(String)
+  MissingField(String)
+  InvalidType(String)
+  InvalidChallenge
+  InvalidOrigin
+}
+
+// Types and methods
+pub enum AttestationFormat {
+  None
+  Packed
+  TPM
+  AndroidKey
+  AndroidSafetyNet
+  FidoU2F
+  Apple
+  Unknown(String)
+}
+pub fn AttestationFormat::from_string(String) -> Self
+pub fn AttestationFormat::to_string(Self) -> String
+pub impl Eq for AttestationFormat
+pub impl Show for AttestationFormat
+
+pub struct AttestationObject {
+  fmt : AttestationFormat
+  att_stmt : @cbor.CborValue
+  auth_data_raw : Bytes
+  auth_data : AuthenticatorData
+}
+pub impl Eq for AttestationObject
+pub impl Show for AttestationObject
+
+pub struct AttestedCredentialData {
+  aaguid : Bytes
+  credential_id : Bytes
+  credential_public_key : Bytes
+  length : Int
+}
+pub impl Eq for AttestedCredentialData
+pub impl Show for AttestedCredentialData
+
+pub struct AuthFlags {
+  user_present : Bool
+  user_verified : Bool
+  backup_eligible : Bool
+  backup_state : Bool
+  attested_credential_data : Bool
+  extension_data : Bool
+  raw : Byte
+}
+pub impl Eq for AuthFlags
+pub impl Show for AuthFlags
+
+pub struct AuthenticatorData {
+  rp_id_hash : Bytes
+  flags : AuthFlags
+  sign_count : UInt
+  attested_credential_data : AttestedCredentialData?
+  extensions : Bytes?
+  length : Int
+}
+pub impl Eq for AuthenticatorData
+pub impl Show for AuthenticatorData
+
+pub struct ClientData {
+  type_ : ClientDataType
+  challenge : Bytes
+  challenge_raw : String
+  origin : String
+  cross_origin : Bool
+  token_binding : Json?
+}
+pub impl Eq for ClientData
+pub impl Show for ClientData
+
+pub(all) enum ClientDataType {
+  Create
+  Get
+}
+pub impl Eq for ClientDataType
+pub impl Show for ClientDataType
+
+// Type aliases
+
+// Traits
+
