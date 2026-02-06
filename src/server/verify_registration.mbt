@@ -64,6 +64,7 @@ pub fn verify_registration_response(
 ) -> VerifiedRegistration raise RegistrationVerifyError {
   // Step 1: Parse and verify clientDataJSON
   let client_data = parse_and_verify_client_data(client_data_json, options)
+  let _ = client_data
 
   // Step 2: Parse attestationObject
   let att_obj = @helpers.parse_attestation_object(attestation_object) catch {
