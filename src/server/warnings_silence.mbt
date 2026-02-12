@@ -6,6 +6,7 @@ fn _touch_unused() -> Unit {
   let _ = AuthenticationVerifyError::ValidationError("")
 }
 
+///|
 fn init {
   _touch_unused()
 }

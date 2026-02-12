@@ -1,5 +1,4 @@
 import {
-  "f4ah6o/simple-webauthn/types" as @types,
   "moonbitlang/async",
 }
 

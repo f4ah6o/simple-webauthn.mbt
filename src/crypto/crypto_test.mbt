@@ -103,10 +103,14 @@ async test "verify_es256_async_with_test_vectors" {
   // Public Key (JWK format):
   // x: 71BVaB3W8ijN95umlD8bUjP4EiGo_46UXE2VITFmUwE
   // y: jB7-2P3LZKV-KlvMwU7zLvBB6TZeVVvkZzlvHqXDtLc
-  let x = @helpers.base64url_decode("71BVaB3W8ijN95umlD8bUjP4EiGo_46UXE2VITFmUwE") catch {
+  let x = @helpers.base64url_decode(
+    "71BVaB3W8ijN95umlD8bUjP4EiGo_46UXE2VITFmUwE",
+  ) catch {
     _ => panic()
   }
-  let y = @helpers.base64url_decode("jB7-2P3LZKV-KlvMwU7zLvBB6TZeVVvkZzlvHqXDtLc") catch {
+  let y = @helpers.base64url_decode(
+    "jB7-2P3LZKV-KlvMwU7zLvBB6TZeVVvkZzlvHqXDtLc",
+  ) catch {
     _ => panic()
   }
   let public_key = @crypto.EC2PublicKey::new(x, y, -7)

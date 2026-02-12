@@ -92,6 +92,7 @@ fn _touch_unused() -> Unit {
   }
 }
 
+///|
 fn init {
   _touch_unused()
 }

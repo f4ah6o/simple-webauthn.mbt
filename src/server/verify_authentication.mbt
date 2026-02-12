@@ -210,7 +210,9 @@ pub fn verify_authentication_response(
   verify_credential_id(credential_id, options)
 
   // Step 2: Parse and verify clientDataJSON
-  let _client_data = parse_and_verify_auth_client_data(client_data_json, options)
+  let _client_data = parse_and_verify_auth_client_data(
+    client_data_json, options,
+  )
 
   // Step 3: Parse authenticatorData
   let auth_data = @helpers.parse_authenticator_data(authenticator_data_bytes) catch {
@@ -401,14 +403,13 @@ fn verify_sign_count(
         )
       }
     }
-    SignCountPolicy::Strict => {
+    SignCountPolicy::Strict =>
       // Counter must always increase, no exceptions
       if new_count <= stored_count {
         raise SignCountInvalid(
           "Sign count \{new_count} is not greater than stored count \{stored_count}. Possible cloned authenticator.",
         )
       }
-    }
   }
 }
 
@@ -446,11 +447,7 @@ pub fn verify_authentication_response_b64(
     _ => raise Base64DecodeError("Failed to decode signature")
   }
   verify_authentication_response(
-    credential_id,
-    client_data_json,
-    authenticator_data,
-    signature,
-    options,
+    credential_id, client_data_json, authenticator_data, signature, options,
   )
 }
 
@@ -499,9 +496,7 @@ pub async fn verify_authentication_response_async(
   } catch {
     e => Err(e)
   }
-  guard cred_check is Ok(_) else {
-    return Err(cred_check.unwrap_err())
-  }
+  guard cred_check is Ok(_) else { return Err(cred_check.unwrap_err()) }
 
   // Step 2: Parse and verify clientDataJSON
   let client_data_result = try {
@@ -515,26 +510,24 @@ pub async fn verify_authentication_response_async(
   }
 
   // Step 3: Parse authenticatorData
-  let auth_data_result = try {
-    Ok(
-      @helpers.parse_authenticator_data(authenticator_data_bytes) catch {
-        @helpers.AuthenticatorDataError::TooShort(expected, actual) =>
-          raise AuthenticatorDataParseError(
-            "Data too short: expected at least \{expected} bytes, got \{actual}",
-          )
-        @helpers.AuthenticatorDataError::InvalidFlags(byte) =>
-          raise AuthenticatorDataParseError("Invalid flags byte: \{byte}")
-        @helpers.AuthenticatorDataError::InvalidAAGUID =>
-          raise AuthenticatorDataParseError("Invalid AAGUID")
-        @helpers.AuthenticatorDataError::InvalidCredentialId =>
-          raise AuthenticatorDataParseError("Invalid credential ID")
-        @helpers.AuthenticatorDataError::InvalidPublicKey(msg) =>
-          raise AuthenticatorDataParseError("Invalid public key: \{msg}")
-        @helpers.AuthenticatorDataError::CborDecodeError(msg) =>
-          raise AuthenticatorDataParseError("CBOR decode error: \{msg}")
-      },
-    )
-  } catch {
+  let auth_data_result = Ok(
+    @helpers.parse_authenticator_data(authenticator_data_bytes) catch {
+      @helpers.AuthenticatorDataError::TooShort(expected, actual) =>
+        raise AuthenticatorDataParseError(
+          "Data too short: expected at least \{expected} bytes, got \{actual}",
+        )
+      @helpers.AuthenticatorDataError::InvalidFlags(byte) =>
+        raise AuthenticatorDataParseError("Invalid flags byte: \{byte}")
+      @helpers.AuthenticatorDataError::InvalidAAGUID =>
+        raise AuthenticatorDataParseError("Invalid AAGUID")
+      @helpers.AuthenticatorDataError::InvalidCredentialId =>
+        raise AuthenticatorDataParseError("Invalid credential ID")
+      @helpers.AuthenticatorDataError::InvalidPublicKey(msg) =>
+        raise AuthenticatorDataParseError("Invalid public key: \{msg}")
+      @helpers.AuthenticatorDataError::CborDecodeError(msg) =>
+        raise AuthenticatorDataParseError("CBOR decode error: \{msg}")
+    },
+  ) catch {
     e => Err(e)
   }
   let auth_data = match auth_data_result {
@@ -549,13 +542,11 @@ pub async fn verify_authentication_response_async(
   } catch {
     e => Err(e)
   }
-  guard auth_verify is Ok(_) else {
-    return Err(auth_verify.unwrap_err())
-  }
+  guard auth_verify is Ok(_) else { return Err(auth_verify.unwrap_err()) }
 
   // Step 5: Parse public key from COSE format
-  let public_key_result = try {
-    Ok(@crypto.parse_cose_ec2_key(options.credential.public_key) catch {
+  let public_key_result = Ok(
+    @crypto.parse_cose_ec2_key(options.credential.public_key) catch {
       @crypto.ECDSAError::InvalidPublicKey(msg) =>
         raise AuthenticationVerifyError::InvalidPublicKey(
           "Invalid COSE key: \{msg}",
@@ -572,8 +563,8 @@ pub async fn verify_authentication_response_async(
         raise AuthenticationVerifyError::InvalidPublicKey(
           "Unexpected error: \{msg}",
         )
-    })
-  } catch {
+    },
+  ) catch {
     AuthenticationVerifyError::InvalidPublicKey(msg) =>
       Err(AuthenticationVerifyError::InvalidPublicKey(msg))
     _ => Err(AuthenticationVerifyError::InvalidPublicKey("Unknown error"))
@@ -603,20 +594,16 @@ pub async fn verify_authentication_response_async(
   } catch {
     e => Err(e)
   }
-  guard count_result is Ok(_) else {
-    return Err(count_result.unwrap_err())
-  }
+  guard count_result is Ok(_) else { return Err(count_result.unwrap_err()) }
 
   // Build result
-  Ok(
-    {
-      credential_id,
-      new_sign_count: auth_data.sign_count,
-      user_verified: auth_data.flags.user_verified,
-      backup_eligible: auth_data.flags.backup_eligible,
-      backup_state: auth_data.flags.backup_state,
-    },
-  )
+  Ok({
+    credential_id,
+    new_sign_count: auth_data.sign_count,
+    user_verified: auth_data.flags.user_verified,
+    backup_eligible: auth_data.flags.backup_eligible,
+    backup_state: auth_data.flags.backup_state,
+  })
 }
 
 ///|
@@ -644,10 +631,6 @@ pub async fn verify_authentication_response_b64_async(
     _ => return Err(Base64DecodeError("Failed to decode signature"))
   }
   verify_authentication_response_async(
-    credential_id,
-    client_data_json,
-    authenticator_data,
-    signature,
-    options,
+    credential_id, client_data_json, authenticator_data, signature, options,
   )
 }

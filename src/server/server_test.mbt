@@ -805,18 +805,11 @@ test "verify_authentication_invalid_utf8" {
     0U,
   )
   let options = @server.VerifyAuthenticationOptions::new(
-    b"test-challenge",
-    "https://example.com",
-    "example.com",
-    credential,
+    b"test-challenge", "https://example.com", "example.com", credential,
   )
   let result = try {
     let _ = @server.verify_authentication_response(
-      b"test-credential-id",
-      invalid_utf8,
-      auth_data,
-      b"fake-signature",
-      options,
+      b"test-credential-id", invalid_utf8, auth_data, b"fake-signature", options,
     )
     Ok(())
   } catch {
@@ -841,18 +834,11 @@ test "verify_authentication_invalid_json" {
     0U,
   )
   let options = @server.VerifyAuthenticationOptions::new(
-    b"test-challenge",
-    "https://example.com",
-    "example.com",
-    credential,
+    b"test-challenge", "https://example.com", "example.com", credential,
   )
   let result = try {
     let _ = @server.verify_authentication_response(
-      b"test-credential-id",
-      invalid_json,
-      auth_data,
-      b"fake-signature",
-      options,
+      b"test-credential-id", invalid_json, auth_data, b"fake-signature", options,
     )
     Ok(())
   } catch {
@@ -878,18 +864,11 @@ test "verify_authentication_wrong_type" {
     0U,
   )
   let options = @server.VerifyAuthenticationOptions::new(
-    b"test-challenge",
-    "https://example.com",
-    "example.com",
-    credential,
+    b"test-challenge", "https://example.com", "example.com", credential,
   )
   let result = try {
     let _ = @server.verify_authentication_response(
-      b"test-credential-id",
-      client_data,
-      auth_data,
-      b"fake-signature",
-      options,
+      b"test-credential-id", client_data, auth_data, b"fake-signature", options,
     )
     Ok(())
   } catch {
@@ -919,11 +898,7 @@ test "verify_authentication_challenge_mismatch" {
   )
   let result = try {
     let _ = @server.verify_authentication_response(
-      b"test-credential-id",
-      client_data,
-      auth_data,
-      b"fake-signature",
-      options,
+      b"test-credential-id", client_data, auth_data, b"fake-signature", options,
     )
     Ok(())
   } catch {
@@ -948,21 +923,17 @@ test "verify_authentication_origin_mismatch" {
     0U,
   )
   let options = @server.VerifyAuthenticationOptions::new(
-    b"test-challenge",
-    "https://example.com", // Expected origin
+    b"test-challenge", "https://example.com", // Expected origin
      "example.com", credential,
   )
   let result = try {
     let _ = @server.verify_authentication_response(
-      b"test-credential-id",
-      client_data,
-      auth_data,
-      b"fake-signature",
-      options,
+      b"test-credential-id", client_data, auth_data, b"fake-signature", options,
     )
     Ok(())
   } catch {
-    @server.AuthenticationVerifyError::OriginMismatch(_) => Err("OriginMismatch")
+    @server.AuthenticationVerifyError::OriginMismatch(_) =>
+      Err("OriginMismatch")
     _ => Err("OtherError")
   }
   assert_eq(result, Err("OriginMismatch"))
@@ -978,13 +949,11 @@ test "verify_authentication_credential_not_allowed" {
   let auth_data = make_auth_data_assertion("example.com", b'\x01', 1U)
   let credential = make_test_credential(
     b"stored-credential-id", // Different from the one being verified
-     make_es256_public_key(), 0U,
+    make_es256_public_key(),
+    0U,
   )
   let options = @server.VerifyAuthenticationOptions::new(
-    b"test-challenge",
-    "https://example.com",
-    "example.com",
-    credential,
+    b"test-challenge", "https://example.com", "example.com", credential,
   )
   let result = try {
     let _ = @server.verify_authentication_response(
@@ -1015,18 +984,12 @@ test "verify_authentication_rp_id_mismatch" {
     0U,
   )
   let options = @server.VerifyAuthenticationOptions::new(
-    b"test-challenge",
-    "https://example.com",
-    "example.com", // Expected rpId
+    b"test-challenge", "https://example.com", "example.com", // Expected rpId
      credential,
   )
   let result = try {
     let _ = @server.verify_authentication_response(
-      b"test-credential-id",
-      client_data,
-      auth_data,
-      b"fake-signature",
-      options,
+      b"test-credential-id", client_data, auth_data, b"fake-signature", options,
     )
     Ok(())
   } catch {
@@ -1052,18 +1015,11 @@ test "verify_authentication_user_not_present" {
     0U,
   )
   let options = @server.VerifyAuthenticationOptions::new(
-    b"test-challenge",
-    "https://example.com",
-    "example.com",
-    credential,
+    b"test-challenge", "https://example.com", "example.com", credential,
   )
   let result = try {
     let _ = @server.verify_authentication_response(
-      b"test-credential-id",
-      client_data,
-      auth_data,
-      b"fake-signature",
-      options,
+      b"test-credential-id", client_data, auth_data, b"fake-signature", options,
     )
     Ok(())
   } catch {
@@ -1088,18 +1044,11 @@ test "verify_authentication_user_verification_required" {
     0U,
   )
   let options = @server.VerifyAuthenticationOptions::new(
-    b"test-challenge",
-    "https://example.com",
-    "example.com",
-    credential,
+    b"test-challenge", "https://example.com", "example.com", credential,
   ).require_user_verification(true) // Require UV
   let result = try {
     let _ = @server.verify_authentication_response(
-      b"test-credential-id",
-      client_data,
-      auth_data,
-      b"fake-signature",
-      options,
+      b"test-credential-id", client_data, auth_data, b"fake-signature", options,
     )
     Ok(())
   } catch {
@@ -1125,18 +1074,11 @@ test "verify_authentication_signature_not_implemented" {
     0U,
   )
   let options = @server.VerifyAuthenticationOptions::new(
-    b"test-challenge",
-    "https://example.com",
-    "example.com",
-    credential,
+    b"test-challenge", "https://example.com", "example.com", credential,
   )
   let result = try {
     let _ = @server.verify_authentication_response(
-      b"test-credential-id",
-      client_data,
-      auth_data,
-      b"fake-signature",
-      options,
+      b"test-credential-id", client_data, auth_data, b"fake-signature", options,
     )
     Ok(())
   } catch {
@@ -1181,10 +1123,7 @@ test "sign_count_policy_default_is_allow_zero" {
     0U,
   )
   let options = @server.VerifyAuthenticationOptions::new(
-    b"test-challenge",
-    "https://example.com",
-    "example.com",
-    credential,
+    b"test-challenge", "https://example.com", "example.com", credential,
   )
   // Check default policy using pattern match (enum is read-only externally)
   guard options.sign_count_policy is @server.SignCountPolicy::AllowZero else {
@@ -1202,10 +1141,7 @@ test "sign_count_policy_with_strict" {
   )
   // Use internal helper to get Strict policy
   let options = @server.VerifyAuthenticationOptions::new(
-    b"test-challenge",
-    "https://example.com",
-    "example.com",
-    credential,
+    b"test-challenge", "https://example.com", "example.com", credential,
   ).with_sign_count_policy_strict()
   guard options.sign_count_policy is @server.SignCountPolicy::Strict else {
     panic()
@@ -1221,10 +1157,7 @@ test "sign_count_policy_with_permissive" {
     0U,
   )
   let options = @server.VerifyAuthenticationOptions::new(
-    b"test-challenge",
-    "https://example.com",
-    "example.com",
-    credential,
+    b"test-challenge", "https://example.com", "example.com", credential,
   ).with_sign_count_policy_permissive()
   guard options.sign_count_policy is @server.SignCountPolicy::Permissive else {
     panic()
@@ -1249,4 +1182,3 @@ test "sign_count_policy_with_origins" {
     panic()
   }
 }
-

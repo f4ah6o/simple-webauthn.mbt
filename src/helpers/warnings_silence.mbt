@@ -9,6 +9,7 @@ fn _touch_unused() -> Unit {
   let _ = ClientDataType::to_string(Create)
 }
 
+///|
 fn init {
   _touch_unused()
 }
