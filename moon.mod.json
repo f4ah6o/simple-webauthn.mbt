@@ -2,15 +2,20 @@
   "name": "f4ah6o/simple-webauthn",
   "version": "0.1.0",
   "deps": {
-    "moonbitlang/async": "0.16.2",
+    "moonbitlang/async": "0.16.6",
     "moonbitlang/x": "0.4.40",
     "mizchi/cbor": "0.1.1",
-    "mizchi/js": "0.10.11"
+    "mizchi/js": "0.10.14"
   },
   "readme": "README.mbt.md",
   "repository": "https://github.com/user/simple-webauthn.mbt",
   "license": "Apache-2.0",
-  "keywords": ["webauthn", "fido2", "authentication", "passkeys"],
+  "keywords": [
+    "webauthn",
+    "fido2",
+    "authentication",
+    "passkeys"
+  ],
   "description": "WebAuthn (FIDO2) implementation for MoonBit - ported from SimpleWebAuthn",
   "source": "src",
   "preferred-target": "js"
