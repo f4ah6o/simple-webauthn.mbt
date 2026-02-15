@@ -5,6 +5,14 @@
 /// `navigator.credentials.create()` API.
 
 ///|
+/// Browser authenticator preference hint.
+pub enum PreferredAuthenticatorType {
+  SecurityKey
+  LocalDevice
+  RemoteDevice
+} derive(Show, Eq)
+
+///|
 /// Input parameters for generating registration options.
 pub struct GenerateRegistrationOptionsInput {
   /// Human-readable name of the Relying Party (e.g., "ACME Corporation")
@@ -33,6 +41,8 @@ pub struct GenerateRegistrationOptionsInput {
   timeout : Int?
   /// UI hints for the browser
   hints : Array[@types.PublicKeyCredentialHint]?
+  /// Encourage a specific authenticator class on supported browsers.
+  preferred_authenticator_type : PreferredAuthenticatorType?
   /// Client extensions
   extensions : Json?
 } derive(Show)
@@ -53,6 +63,7 @@ pub fn GenerateRegistrationOptionsInput::new(
   supported_algorithm_ids? : Array[Int]? = None,
   timeout? : Int? = None,
   hints? : Array[@types.PublicKeyCredentialHint]? = None,
+  preferred_authenticator_type? : PreferredAuthenticatorType? = None,
   extensions? : Json? = None,
 ) -> GenerateRegistrationOptionsInput {
   {
@@ -68,6 +79,7 @@ pub fn GenerateRegistrationOptionsInput::new(
     supported_algorithm_ids,
     timeout,
     hints,
+    preferred_authenticator_type,
     extensions,
   }
 }
@@ -83,8 +95,8 @@ let default_challenge_length : Int = 32
 let default_user_id_length : Int = 32
 
 ///|
-/// Default supported algorithms: ES256 (-7) and RS256 (-257)
-let default_algorithms : Array[Int] = [-7, -257]
+/// Default supported algorithms: EdDSA (-8), ES256 (-7), RS256 (-257)
+let default_algorithms : Array[Int] = [-8, -7, -257]
 
 ///|
 /// Generate random bytes using ChaCha8 PRNG.
@@ -173,6 +185,37 @@ pub fn generate_registration_options(
     None => Some(@types.AttestationConveyance::None)
   }
 
+  let hints = match input.hints {
+    Some(h) => h
+    None => []
+  }
+
+  match input.preferred_authenticator_type {
+    Some(PreferredAuthenticatorType::SecurityKey) => {
+      if not(hints.iter().any(fn(h) { h == @types.PublicKeyCredentialHint::SecurityKey })) {
+        hints.push(@types.PublicKeyCredentialHint::SecurityKey)
+      }
+    }
+    Some(PreferredAuthenticatorType::LocalDevice) => {
+      if not(hints.iter().any(fn(h) { h == @types.PublicKeyCredentialHint::ClientDevice })) {
+        hints.push(@types.PublicKeyCredentialHint::ClientDevice)
+      }
+    }
+    Some(PreferredAuthenticatorType::RemoteDevice) => {
+      if not(hints.iter().any(fn(h) { h == @types.PublicKeyCredentialHint::Hybrid })) {
+        hints.push(@types.PublicKeyCredentialHint::Hybrid)
+      }
+    }
+    None => ()
+  }
+
+  let hints_option = if hints.length() == 0 {
+    Option::None
+  } else {
+    Option::Some(hints)
+  }
+  let extensions = ensure_cred_props_extension(input.extensions)
+
   // Build the final options
   @types.PublicKeyCredentialCreationOptionsJSON::new(
     rp,
@@ -182,7 +225,20 @@ pub fn generate_registration_options(
     timeout~,
     exclude_credentials=input.exclude_credentials,
     authenticator_selection=input.authenticator_selection,
-    hints=input.hints,
+    hints=hints_option,
     attestation~,
+    extensions~,
   )
+}
+
+///|
+fn ensure_cred_props_extension(extensions : Json?) -> Json? {
+  match extensions {
+    Some(Json::Object(existing)) => {
+      existing["credProps"] = true.to_json()
+      Some(Json::object(existing))
+    }
+    Some(other) => Some(other)
+    None => Some(Json::object({ "credProps": true.to_json() }))
+  }
 }

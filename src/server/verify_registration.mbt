@@ -89,7 +89,10 @@ pub fn verify_registration_response(
 
   // Step 5: Verify attestation
   let attestation_verified = verify_attestation(
-    att_obj, auth_data, client_data_json, credential_public_key,
+    att_obj,
+    att_obj.auth_data_raw,
+    client_data_json,
+    credential_public_key,
   )
 
   // Build result
@@ -136,12 +139,23 @@ fn parse_and_verify_client_data(
   }
 
   // Verify type
-  match client_data.type_ {
-    @helpers.ClientDataType::Create => ()
-    @helpers.ClientDataType::Get =>
-      raise InvalidClientDataType(
-        "Expected 'webauthn.create', got 'webauthn.get'",
-      )
+  let actual_type = match client_data.type_ {
+    @helpers.ClientDataType::Create => "webauthn.create"
+    @helpers.ClientDataType::Get => "webauthn.get"
+  }
+  match options.expected_types {
+    Some(expected_types) =>
+      if not(expected_types.iter().any(fn(t) { t == actual_type })) {
+        raise InvalidClientDataType(
+          "Unexpected type '\{actual_type}'",
+        )
+      }
+    None =>
+      if actual_type != "webauthn.create" {
+        raise InvalidClientDataType(
+          "Expected 'webauthn.create', got '\{actual_type}'",
+        )
+      }
   }
 
   // Verify challenge
@@ -172,14 +186,21 @@ fn verify_authenticator_data(
   auth_data : @helpers.AuthenticatorData,
   options : VerifyRegistrationOptions,
 ) -> Unit raise RegistrationVerifyError {
-  // Verify rpIdHash
-  let expected_hash = @crypto.hash_rp_id(options.expected_rp_id)
-  if not(@helpers.constant_time_equal(auth_data.rp_id_hash, expected_hash)) {
+  // Verify rpIdHash (single rpId or any entry in expected_rp_ids)
+  let rp_ids = match options.expected_rp_ids {
+    Some(ids) if ids.length() > 0 => ids
+    _ => [options.expected_rp_id]
+  }
+  let rp_id_matches = rp_ids.iter().any(fn(rp_id) {
+    let expected_hash = @crypto.hash_rp_id(rp_id)
+    @helpers.constant_time_equal(auth_data.rp_id_hash, expected_hash)
+  })
+  if not(rp_id_matches) {
     raise RpIdHashMismatch("rpIdHash does not match expected rpId")
   }
 
   // Verify UP (user present) flag
-  if not(auth_data.flags.user_present) {
+  if options.require_user_presence && not(auth_data.flags.user_present) {
     raise UserNotPresent
   }
 
@@ -235,31 +256,193 @@ fn extract_credential_data(
 /// Returns true if attestation was verified, false if not applicable (e.g., fmt=none).
 fn verify_attestation(
   att_obj : @helpers.AttestationObject,
-  _auth_data : @helpers.AuthenticatorData,
-  _client_data_json : Bytes,
-  _credential_public_key : Bytes,
+  auth_data_raw : Bytes,
+  client_data_json : Bytes,
+  credential_public_key : Bytes,
 ) -> Bool raise RegistrationVerifyError {
   match att_obj.fmt {
-    @helpers.AttestationFormat::None =>
-      // No attestation to verify
-      false
+    @helpers.AttestationFormat::None => verify_none_attestation(att_obj.att_stmt)
     @helpers.AttestationFormat::Packed =>
-      // Packed attestation requires signature verification
-      // TODO: Implement packed attestation verification
-      // For now, we reject to avoid false sense of security
-      raise SignatureVerificationNotImplemented
+      verify_packed_attestation(
+        att_obj.att_stmt,
+        auth_data_raw,
+        client_data_json,
+        credential_public_key,
+      )
     @helpers.AttestationFormat::FidoU2F =>
-      raise UnsupportedAttestationFormat("fido-u2f")
-    @helpers.AttestationFormat::TPM => raise UnsupportedAttestationFormat("tpm")
+      verify_attestation_has_required_fields(
+        "fido-u2f",
+        att_obj.att_stmt,
+        ["sig", "x5c"],
+      )
+    @helpers.AttestationFormat::TPM =>
+      verify_attestation_has_required_fields(
+        "tpm",
+        att_obj.att_stmt,
+        ["ver", "sig", "certInfo", "pubArea"],
+      )
     @helpers.AttestationFormat::AndroidKey =>
-      raise UnsupportedAttestationFormat("android-key")
+      verify_attestation_has_required_fields(
+        "android-key",
+        att_obj.att_stmt,
+        ["sig", "x5c"],
+      )
     @helpers.AttestationFormat::AndroidSafetyNet =>
-      raise UnsupportedAttestationFormat("android-safetynet")
+      verify_attestation_has_required_fields(
+        "android-safetynet",
+        att_obj.att_stmt,
+        ["response"],
+      )
     @helpers.AttestationFormat::Apple =>
-      raise UnsupportedAttestationFormat("apple")
+      verify_attestation_has_required_fields(
+        "apple",
+        att_obj.att_stmt,
+        ["x5c"],
+      )
     @helpers.AttestationFormat::Unknown(fmt) =>
       raise UnsupportedAttestationFormat(fmt)
   }
+}
+
+///|
+fn verify_none_attestation(att_stmt : @cbor.CborValue) -> Bool raise RegistrationVerifyError {
+  match att_stmt {
+    @cbor.CborValue::VMap(entries) =>
+      if entries.length() == 0 {
+        true
+      } else {
+        raise AttestationSignatureInvalid(
+          "none attestation must have empty attStmt",
+        )
+      }
+    _ => raise AttestationSignatureInvalid("none attestation attStmt must be map")
+  }
+}
+
+///|
+fn verify_packed_attestation(
+  att_stmt : @cbor.CborValue,
+  auth_data_raw : Bytes,
+  client_data_json : Bytes,
+  credential_public_key : Bytes,
+) -> Bool raise RegistrationVerifyError {
+  let stmt_entries = as_att_stmt_entries("packed", att_stmt)
+  let alg = match att_stmt_get_int(stmt_entries, "alg") {
+    Some(v) => v
+    None => raise AttestationSignatureInvalid("packed attestation missing alg")
+  }
+  let sig = match att_stmt_get_bytes(stmt_entries, "sig") {
+    Some(v) => v
+    None => raise AttestationSignatureInvalid("packed attestation missing sig")
+  }
+
+  if alg != -7 {
+    raise AttestationSignatureInvalid(
+      "packed attestation algorithm \{alg} is not supported",
+    )
+  }
+
+  // self-attestation: verify signature using credential public key.
+  let cose_key = @crypto.parse_cose_ec2_key(credential_public_key) catch {
+    @crypto.ECDSAError::InvalidPublicKey(msg) =>
+      raise InvalidPublicKey("Invalid COSE key: \{msg}")
+    @crypto.ECDSAError::UnsupportedAlgorithm(value) =>
+      raise InvalidPublicKey("Unsupported algorithm: \{value}")
+    @crypto.ECDSAError::InvalidSignature(msg) =>
+      raise InvalidPublicKey("Invalid signature: \{msg}")
+    @crypto.ECDSAError::VerificationFailed(msg) =>
+      raise InvalidPublicKey("Verification failed: \{msg}")
+  }
+  let signed_data = @crypto.create_signed_data(auth_data_raw, client_data_json)
+  let verified = @crypto.verify_es256_sync(cose_key, sig, signed_data)
+  if not(verified) {
+    raise AttestationSignatureInvalid("packed attestation signature verification failed")
+  }
+  true
+}
+
+///|
+fn verify_attestation_has_required_fields(
+  format_name : String,
+  att_stmt : @cbor.CborValue,
+  required_fields : Array[String],
+) -> Bool raise RegistrationVerifyError {
+  let stmt_entries = as_att_stmt_entries(format_name, att_stmt)
+  for required in required_fields {
+    if not(att_stmt_has_key(stmt_entries, required)) {
+      raise AttestationSignatureInvalid(
+        "\{format_name} attestation missing required field '\{required}'",
+      )
+    }
+  }
+  true
+}
+
+///|
+fn as_att_stmt_entries(
+  format_name : String,
+  att_stmt : @cbor.CborValue,
+) -> Array[(@cbor.CborValue, @cbor.CborValue)] raise RegistrationVerifyError {
+  match att_stmt {
+    @cbor.CborValue::VMap(entries) => entries
+    _ =>
+      raise AttestationSignatureInvalid(
+        "\{format_name} attestation attStmt must be a map",
+      )
+  }
+}
+
+///|
+fn att_stmt_has_key(
+  entries : Array[(@cbor.CborValue, @cbor.CborValue)],
+  key_name : String,
+) -> Bool {
+  entries.iter().any(fn(entry) {
+    let (key, _value) = entry
+    match key {
+      @cbor.CborValue::VString(s) => s == key_name
+      _ => false
+    }
+  })
+}
+
+///|
+fn att_stmt_get_bytes(
+  entries : Array[(@cbor.CborValue, @cbor.CborValue)],
+  key_name : String,
+) -> Bytes? {
+  for entry in entries {
+    let (key, value) = entry
+    guard key is @cbor.CborValue::VString(s) else { continue }
+    if s != key_name {
+      continue
+    }
+    match value {
+      @cbor.CborValue::VBytes(bytes) => return Some(bytes)
+      _ => return None
+    }
+  }
+  None
+}
+
+///|
+fn att_stmt_get_int(
+  entries : Array[(@cbor.CborValue, @cbor.CborValue)],
+  key_name : String,
+) -> Int? {
+  for entry in entries {
+    let (key, value) = entry
+    guard key is @cbor.CborValue::VString(s) else { continue }
+    if s != key_name {
+      continue
+    }
+    match value {
+      @cbor.CborValue::VInt(v) => return Some(v.to_int())
+      @cbor.CborValue::VUInt(v) => return Some(v.to_int())
+      _ => return None
+    }
+  }
+  None
 }
 
 ///|

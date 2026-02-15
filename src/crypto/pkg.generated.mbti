@@ -22,6 +22,8 @@ pub fn sha256_string(String) -> Bytes
 
 pub fn to_uncompressed_public_key(EC2PublicKey) -> Bytes
 
+pub async fn verify_es256_async(EC2PublicKey, Bytes, Bytes) -> Bool
+
 pub fn verify_es256_sync(EC2PublicKey, Bytes, Bytes) -> Bool
 
 pub fn verify_rp_id_hash(Bytes, String) -> Bool
@@ -40,6 +42,7 @@ pub struct EC2PublicKey {
   y : Bytes
   alg : Int
 }
+pub fn EC2PublicKey::new(Bytes, Bytes, Int) -> Self
 pub impl Eq for EC2PublicKey
 pub impl Show for EC2PublicKey
 

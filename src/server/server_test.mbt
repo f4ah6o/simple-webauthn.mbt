@@ -483,7 +483,7 @@ test "verify_registration_success_fmt_none" {
   assert_eq(result.backup_state, false)
   // attestation_format is None variant
   inspect(result.attestation_format, content="None")
-  assert_eq(result.attestation_verified, false) // fmt=none means not verified
+  assert_eq(result.attestation_verified, true) // fmt=none with empty statement is valid
 }
 
 ///|
@@ -537,10 +537,11 @@ test "generate_registration_options_basic" {
   assert_true(options.challenge.value.length() >= 42)
   // Check user id is generated
   assert_true(options.user.id.length() >= 42)
-  // Check default algorithms (ES256 and RS256)
-  assert_eq(options.pub_key_cred_params.length(), 2)
-  assert_eq(options.pub_key_cred_params[0].alg.to_int(), -7) // ES256
-  assert_eq(options.pub_key_cred_params[1].alg.to_int(), -257) // RS256
+  // Check default algorithms (EdDSA, ES256, RS256)
+  assert_eq(options.pub_key_cred_params.length(), 3)
+  assert_eq(options.pub_key_cred_params[0].alg.to_int(), -8) // EdDSA
+  assert_eq(options.pub_key_cred_params[1].alg.to_int(), -7) // ES256
+  assert_eq(options.pub_key_cred_params[2].alg.to_int(), -257) // RS256
   // Check default timeout
   inspect(options.timeout, content="Some(60000)")
   // Check default attestation
@@ -1181,4 +1182,157 @@ test "sign_count_policy_with_origins" {
   guard options.sign_count_policy is @server.SignCountPolicy::AllowZero else {
     panic()
   }
+}
+
+///|
+test "verify_registration_with_expected_types_override" {
+  let challenge_b64 = @helpers.base64url_encode(b"test-challenge")
+  let client_data = make_client_data_json(
+    "webauthn.get",
+    challenge_b64,
+    "https://example.com",
+  )
+  let attestation_obj = make_attestation_object_none(
+    make_auth_data(
+      "example.com",
+      b'\x41',
+      0U,
+      Some(b"cred-id"),
+      Some(make_es256_public_key()),
+    ),
+  )
+  let options = @server.VerifyRegistrationOptions::new(
+    b"test-challenge",
+    "https://example.com",
+    "example.com",
+  ).with_expected_types(["webauthn.get"])
+
+  let result = @server.verify_registration_response(
+    client_data,
+    attestation_obj,
+    options,
+  ) catch {
+    _ => panic()
+  }
+  assert_eq(result.attestation_verified, true)
+}
+
+///|
+test "verify_authentication_with_expected_types_override" {
+  let challenge_b64 = @helpers.base64url_encode(b"test-challenge")
+  let client_data = make_client_data_json(
+    "webauthn.create",
+    challenge_b64,
+    "https://example.com",
+  )
+  let auth_data = make_auth_data_assertion("example.com", b'\x01', 1U)
+  let credential = make_test_credential(
+    b"test-credential-id",
+    make_es256_public_key(),
+    0U,
+  )
+  let options = @server.VerifyAuthenticationOptions::new(
+    b"test-challenge",
+    "https://example.com",
+    "example.com",
+    credential,
+  ).with_expected_types(["webauthn.create"])
+
+  let result = try {
+    let _ = @server.verify_authentication_response(
+      b"test-credential-id",
+      client_data,
+      auth_data,
+      b"fake-signature",
+      options,
+    )
+    Ok(())
+  } catch {
+    @server.AuthenticationVerifyError::SignatureVerificationFailed(_) =>
+      Err("SignatureVerificationFailed")
+    _ => Err("OtherError")
+  }
+  assert_eq(result, Err("SignatureVerificationFailed"))
+}
+
+// ============================================================================
+// METADATA / SETTINGS SERVICE TESTS
+// ============================================================================
+
+///|
+test "settings_service_set_get_clear" {
+  @server.set_root_certificates(
+    @server.RootCertIdentifier::Apple,
+    ["cert-a", "cert-b"],
+  )
+  let certs = @server.get_root_certificates(@server.RootCertIdentifier::Apple)
+  assert_eq(certs.length(), 2)
+  assert_eq(certs[0], "cert-a")
+  assert_eq(certs[1], "cert-b")
+
+  @server.clear_root_certificates(@server.RootCertIdentifier::Apple)
+  let cleared = @server.get_root_certificates(@server.RootCertIdentifier::Apple)
+  assert_eq(cleared.length(), 0)
+}
+
+///|
+async test "metadata_service_local_statement_strict" {
+  let statement = @server.MetadataStatement::new(
+    "00112233-4455-6677-8899-aabbccddeeff",
+    Json::object({ "description": "local-test".to_json() }),
+  )
+  let init_result = @server.metadata_service_initialize(
+    options=Some(@server.MetadataServiceInitializeOptions::new(
+      mds_servers=Some([]),
+      statements=Some([statement]),
+      verification_mode=Some(@server.VerificationMode::Strict),
+    )),
+  )
+  guard init_result is Ok(_) else { panic() }
+
+  let found = @server.metadata_service_get_statement(statement.aaguid) catch {
+    _ => None
+  }
+  guard found is Some(value) else { panic() }
+  assert_eq(value.aaguid, statement.aaguid)
+}
+
+///|
+async test "metadata_service_missing_statement_strict_errors" {
+  let init_result = @server.metadata_service_initialize(
+    options=Some(@server.MetadataServiceInitializeOptions::new(
+      mds_servers=Some([]),
+      verification_mode=Some(@server.VerificationMode::Strict),
+    )),
+  )
+  guard init_result is Ok(_) else { panic() }
+
+  let result = try {
+    let _ = @server.metadata_service_get_statement(
+      "ffffffff-ffff-ffff-ffff-ffffffffffff",
+    )
+    Ok(())
+  } catch {
+    @server.MetadataServiceError::StatementNotFound(_) => Err("StatementNotFound")
+    _ => Err("OtherError")
+  }
+  assert_eq(result, Err("StatementNotFound"))
+}
+
+///|
+async test "metadata_service_missing_statement_permissive" {
+  let init_result = @server.metadata_service_initialize(
+    options=Some(@server.MetadataServiceInitializeOptions::new(
+      mds_servers=Some([]),
+      verification_mode=Some(@server.VerificationMode::Permissive),
+    )),
+  )
+  guard init_result is Ok(_) else { panic() }
+
+  let found = @server.metadata_service_get_statement(
+    "ffffffff-ffff-ffff-ffff-ffffffffffff",
+  ) catch {
+    _ => None
+  }
+  assert_eq(found, None)
 }

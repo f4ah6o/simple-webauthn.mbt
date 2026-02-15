@@ -300,6 +300,7 @@ pub struct PublicKeyCredentialCreationOptionsJSON {
   attestation_formats : Array[AttestationFormat]?
   extensions : Json?
 }
+pub fn PublicKeyCredentialCreationOptionsJSON::new(RelyingParty, PublicKeyCredentialUserEntity, Base64URLString, Array[PublicKeyCredentialParameters], timeout? : Int?, exclude_credentials? : Array[PublicKeyCredentialDescriptor]?, authenticator_selection? : AuthenticatorSelectionCriteria?, hints? : Array[PublicKeyCredentialHint]?, attestation? : AttestationConveyance?, attestation_formats? : Array[AttestationFormat]?, extensions? : Json?) -> Self
 pub impl Eq for PublicKeyCredentialCreationOptionsJSON
 pub impl Show for PublicKeyCredentialCreationOptionsJSON
 pub impl ToJson for PublicKeyCredentialCreationOptionsJSON
@@ -310,6 +311,7 @@ pub struct PublicKeyCredentialDescriptor {
   type_ : PublicKeyCredentialType
   transports : Array[AuthenticatorTransport]?
 }
+pub fn PublicKeyCredentialDescriptor::new(Base64URLString, transports? : Array[AuthenticatorTransport]?) -> Self
 pub impl Eq for PublicKeyCredentialDescriptor
 pub impl Show for PublicKeyCredentialDescriptor
 pub impl ToJson for PublicKeyCredentialDescriptor
@@ -331,6 +333,7 @@ pub struct PublicKeyCredentialParameters {
   type_ : PublicKeyCredentialType
   alg : COSEAlgorithm
 }
+pub fn PublicKeyCredentialParameters::new(COSEAlgorithm) -> Self
 pub impl Eq for PublicKeyCredentialParameters
 pub impl Show for PublicKeyCredentialParameters
 pub impl ToJson for PublicKeyCredentialParameters
@@ -345,6 +348,7 @@ pub struct PublicKeyCredentialRequestOptionsJSON {
   hints : Array[PublicKeyCredentialHint]?
   extensions : Json?
 }
+pub fn PublicKeyCredentialRequestOptionsJSON::new(Base64URLString, timeout? : Int?, rp_id? : String?, allow_credentials? : Array[PublicKeyCredentialDescriptor]?, user_verification? : UserVerification?, hints? : Array[PublicKeyCredentialHint]?, extensions? : Json?) -> Self
 pub impl Eq for PublicKeyCredentialRequestOptionsJSON
 pub impl Show for PublicKeyCredentialRequestOptionsJSON
 pub impl ToJson for PublicKeyCredentialRequestOptionsJSON
@@ -365,6 +369,7 @@ pub struct PublicKeyCredentialUserEntity {
   name : String
   display_name : String
 }
+pub fn PublicKeyCredentialUserEntity::new(String, String, String) -> Self
 pub impl Eq for PublicKeyCredentialUserEntity
 pub impl Show for PublicKeyCredentialUserEntity
 pub impl ToJson for PublicKeyCredentialUserEntity
@@ -399,6 +404,7 @@ pub struct RelyingParty {
   id : String?
   name : String
 }
+pub fn RelyingParty::new(String, id? : String?) -> Self
 pub impl Eq for RelyingParty
 pub impl Show for RelyingParty
 pub impl ToJson for RelyingParty

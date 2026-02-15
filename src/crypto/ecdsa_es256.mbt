@@ -241,24 +241,82 @@ fn normalize_integer(bytes : Bytes, target_len : Int) -> Bytes {
 }
 
 ///|
-/// Verify an ES256 signature (stub implementation).
-/// 
-/// ## Note
-/// 
-/// This is a placeholder. Full verification requires WebCrypto FFI
-/// which will be implemented in a follow-up. For now, this always
-/// returns false to indicate "not verified".
-/// 
-/// In production, use the async `verify_es256_async` function which
-/// calls the WebCrypto API.
+/// Node.js synchronous ES256 verification helper.
+extern "js" fn ffi_verify_es256_sync(
+  x_b64u : String,
+  y_b64u : String,
+  signature_der_b64u : String,
+  signature_raw_b64u : String,
+  data_b64u : String,
+) -> Bool =
+  #| (x_b64u, y_b64u, signature_der_b64u, signature_raw_b64u, data_b64u) => {
+  #|   try {
+  #|     const nodeCrypto = require("crypto");
+  #|
+  #|     const b64uToBuffer = (s) => {
+  #|       const b64 = s.replace(/-/g, "+").replace(/_/g, "/");
+  #|       const pad = (4 - (b64.length % 4)) % 4;
+  #|       return Buffer.from(b64 + "=".repeat(pad), "base64");
+  #|     };
+  #|
+  #|     const data = b64uToBuffer(data_b64u);
+  #|     const signatureDer = b64uToBuffer(signature_der_b64u);
+  #|     const signatureRaw = b64uToBuffer(signature_raw_b64u);
+  #|
+  #|     const keyObject = nodeCrypto.createPublicKey({
+  #|       key: {
+  #|         kty: "EC",
+  #|         crv: "P-256",
+  #|         x: x_b64u,
+  #|         y: y_b64u,
+  #|       },
+  #|       format: "jwk",
+  #|     });
+  #|
+  #|     const okP1363Der = nodeCrypto.verify(
+  #|       "sha256",
+  #|       data,
+  #|       { key: keyObject, dsaEncoding: "ieee-p1363" },
+  #|       signatureDer,
+  #|     );
+  #|     if (okP1363Der) return true;
+  #|
+  #|     const okP1363Raw = nodeCrypto.verify(
+  #|       "sha256",
+  #|       data,
+  #|       { key: keyObject, dsaEncoding: "ieee-p1363" },
+  #|       signatureRaw,
+  #|     );
+  #|     if (okP1363Raw) return true;
+  #|
+  #|     const okDer = nodeCrypto.verify("sha256", data, keyObject, signatureDer);
+  #|     if (okDer) return true;
+  #|
+  #|     return nodeCrypto.verify("sha256", data, keyObject, signatureRaw);
+  #|   } catch (_e) {
+  #|     return false;
+  #|   }
+  #| }
+
+///|
+/// Verify an ES256 signature (synchronous, Node.js runtime).
 pub fn verify_es256_sync(
-  _public_key : EC2PublicKey,
-  _signature : Bytes,
-  _data : Bytes,
+  public_key : EC2PublicKey,
+  signature : Bytes,
+  data : Bytes,
 ) -> Bool {
-  // TODO: Implement pure MoonBit ECDSA or FFI
-  // For now, return false (not verified)
-  false
+  if public_key.alg != -7 {
+    return false
+  }
+
+  let normalized = normalize_signature(signature) catch { _ => signature }
+  ffi_verify_es256_sync(
+    @helpers.base64url_encode(public_key.x),
+    @helpers.base64url_encode(public_key.y),
+    @helpers.base64url_encode(signature),
+    @helpers.base64url_encode(normalized),
+    @helpers.base64url_encode(data),
+  )
 }
 
 ///|

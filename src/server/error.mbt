@@ -141,8 +141,17 @@ pub struct VerifyRegistrationOptions {
   expected_origins : Array[String]
   /// Expected rpId (hashed and compared with authenticatorData.rpIdHash)
   expected_rp_id : String
+  /// Optional additional expected rpIds (at least one hash must match)
+  expected_rp_ids : Array[String]?
+  /// Optional expected clientDataJSON.type values
+  expected_types : Array[String]?
   /// Whether to require user verification (UV flag)
   require_user_verification : Bool
+  /// Whether to require user presence (UP flag)
+  require_user_presence : Bool
+  /// Whether SafetyNet CTS profile check should be enforced.
+  /// This flag is currently reserved for compatibility with upstream options.
+  attestation_safetynet_enforce_cts_check : Bool
 } derive(Show, Eq)
 
 ///|
@@ -156,7 +165,11 @@ pub fn VerifyRegistrationOptions::new(
     expected_challenge: challenge,
     expected_origins: [origin],
     expected_rp_id: rp_id,
+    expected_rp_ids: None,
+    expected_types: None,
     require_user_verification: false,
+    require_user_presence: true,
+    attestation_safetynet_enforce_cts_check: true,
   }
 }
 
@@ -171,7 +184,34 @@ pub fn VerifyRegistrationOptions::with_origins(
     expected_challenge: challenge,
     expected_origins: origins,
     expected_rp_id: rp_id,
+    expected_rp_ids: None,
+    expected_types: None,
     require_user_verification: false,
+    require_user_presence: true,
+    attestation_safetynet_enforce_cts_check: true,
+  }
+}
+
+///|
+/// Create verification options with multiple allowed RP IDs.
+pub fn VerifyRegistrationOptions::with_rp_ids(
+  challenge : Bytes,
+  origins : Array[String],
+  rp_ids : Array[String],
+) -> VerifyRegistrationOptions {
+  let first_rp_id = match rp_ids.get(0) {
+    Some(v) => v
+    None => ""
+  }
+  {
+    expected_challenge: challenge,
+    expected_origins: origins,
+    expected_rp_id: first_rp_id,
+    expected_rp_ids: Some(rp_ids),
+    expected_types: None,
+    require_user_verification: false,
+    require_user_presence: true,
+    attestation_safetynet_enforce_cts_check: true,
   }
 }
 
@@ -182,4 +222,48 @@ pub fn VerifyRegistrationOptions::require_user_verification(
   required : Bool,
 ) -> VerifyRegistrationOptions {
   { ..self, require_user_verification: required }
+}
+
+///|
+/// Set whether user presence is required.
+pub fn VerifyRegistrationOptions::require_user_presence(
+  self : VerifyRegistrationOptions,
+  required : Bool,
+) -> VerifyRegistrationOptions {
+  { ..self, require_user_presence: required }
+}
+
+///|
+/// Set accepted clientDataJSON.type values.
+pub fn VerifyRegistrationOptions::with_expected_types(
+  self : VerifyRegistrationOptions,
+  expected_types : Array[String],
+) -> VerifyRegistrationOptions {
+  { ..self, expected_types: Some(expected_types) }
+}
+
+///|
+/// Set expected RP IDs for hash matching.
+pub fn VerifyRegistrationOptions::with_expected_rp_ids(
+  self : VerifyRegistrationOptions,
+  expected_rp_ids : Array[String],
+) -> VerifyRegistrationOptions {
+  let first_rp_id = match expected_rp_ids.get(0) {
+    Some(v) => v
+    None => self.expected_rp_id
+  }
+  {
+    ..self,
+    expected_rp_id: first_rp_id,
+    expected_rp_ids: Some(expected_rp_ids),
+  }
+}
+
+///|
+/// Set SafetyNet CTS check behavior.
+pub fn VerifyRegistrationOptions::with_attestation_safetynet_enforce_cts_check(
+  self : VerifyRegistrationOptions,
+  enforce : Bool,
+) -> VerifyRegistrationOptions {
+  { ..self, attestation_safetynet_enforce_cts_check: enforce }
 }

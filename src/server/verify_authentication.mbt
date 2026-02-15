@@ -65,8 +65,15 @@ pub struct VerifyAuthenticationOptions {
   expected_origins : Array[String]
   /// Expected rpId (hashed and compared with authenticatorData.rpIdHash)
   expected_rp_id : String
+  /// Optional additional expected rpIds (at least one hash must match)
+  expected_rp_ids : Array[String]?
+  /// Optional expected clientDataJSON.type values
+  expected_types : Array[String]?
   /// Whether to require user verification (UV flag)
   require_user_verification : Bool
+  /// Optional advanced FIDO user verification mode.
+  /// When set, UV/UP handling follows FIDO conformance behavior.
+  advanced_fido_user_verification : @types.UserVerification?
   /// The stored credential from registration
   credential : AuthenticatorCredential
   /// Policy for handling signature counter validation (default: AllowZero)
@@ -85,7 +92,10 @@ pub fn VerifyAuthenticationOptions::new(
     expected_challenge: challenge,
     expected_origins: [origin],
     expected_rp_id: rp_id,
+    expected_rp_ids: None,
+    expected_types: None,
     require_user_verification: false,
+    advanced_fido_user_verification: None,
     credential,
     sign_count_policy: SignCountPolicy::AllowZero,
   }
@@ -103,7 +113,10 @@ pub fn VerifyAuthenticationOptions::with_origins(
     expected_challenge: challenge,
     expected_origins: origins,
     expected_rp_id: rp_id,
+    expected_rp_ids: None,
+    expected_types: None,
     require_user_verification: false,
+    advanced_fido_user_verification: None,
     credential,
     sign_count_policy: SignCountPolicy::AllowZero,
   }
@@ -116,6 +129,41 @@ pub fn VerifyAuthenticationOptions::require_user_verification(
   required : Bool,
 ) -> VerifyAuthenticationOptions {
   { ..self, require_user_verification: required }
+}
+
+///|
+/// Set accepted clientDataJSON.type values.
+pub fn VerifyAuthenticationOptions::with_expected_types(
+  self : VerifyAuthenticationOptions,
+  expected_types : Array[String],
+) -> VerifyAuthenticationOptions {
+  { ..self, expected_types: Some(expected_types) }
+}
+
+///|
+/// Set expected RP IDs for hash matching.
+pub fn VerifyAuthenticationOptions::with_expected_rp_ids(
+  self : VerifyAuthenticationOptions,
+  expected_rp_ids : Array[String],
+) -> VerifyAuthenticationOptions {
+  let first_rp_id = match expected_rp_ids.get(0) {
+    Some(v) => v
+    None => self.expected_rp_id
+  }
+  {
+    ..self,
+    expected_rp_id: first_rp_id,
+    expected_rp_ids: Some(expected_rp_ids),
+  }
+}
+
+///|
+/// Set advanced FIDO user verification behavior.
+pub fn VerifyAuthenticationOptions::with_advanced_fido_user_verification(
+  self : VerifyAuthenticationOptions,
+  mode : @types.UserVerification,
+) -> VerifyAuthenticationOptions {
+  { ..self, advanced_fido_user_verification: Some(mode) }
 }
 
 ///|
@@ -302,13 +350,21 @@ fn parse_and_verify_auth_client_data(
       raise ClientDataParseError("Invalid origin format")
   }
 
-  // Verify type is "webauthn.get"
-  match client_data.type_ {
-    @helpers.ClientDataType::Get => ()
-    @helpers.ClientDataType::Create =>
-      raise InvalidClientDataType(
-        "Expected 'webauthn.get', got 'webauthn.create'",
-      )
+  let actual_type = match client_data.type_ {
+    @helpers.ClientDataType::Create => "webauthn.create"
+    @helpers.ClientDataType::Get => "webauthn.get"
+  }
+  match options.expected_types {
+    Some(expected_types) =>
+      if not(expected_types.iter().any(fn(t) { t == actual_type })) {
+        raise InvalidClientDataType("Unexpected type '\{actual_type}'")
+      }
+    None =>
+      if actual_type != "webauthn.get" {
+        raise InvalidClientDataType(
+          "Expected 'webauthn.get', got '\{actual_type}'",
+        )
+      }
   }
 
   // Verify challenge
@@ -339,20 +395,35 @@ fn verify_auth_authenticator_data(
   auth_data : @helpers.AuthenticatorData,
   options : VerifyAuthenticationOptions,
 ) -> Unit raise AuthenticationVerifyError {
-  // Verify rpIdHash
-  let expected_hash = @crypto.hash_rp_id(options.expected_rp_id)
-  if not(@helpers.constant_time_equal(auth_data.rp_id_hash, expected_hash)) {
+  // Verify rpIdHash (single rpId or any entry in expected_rp_ids)
+  let rp_ids = match options.expected_rp_ids {
+    Some(ids) if ids.length() > 0 => ids
+    _ => [options.expected_rp_id]
+  }
+  let rp_id_matches = rp_ids.iter().any(fn(rp_id) {
+    let expected_hash = @crypto.hash_rp_id(rp_id)
+    @helpers.constant_time_equal(auth_data.rp_id_hash, expected_hash)
+  })
+  if not(rp_id_matches) {
     raise RpIdHashMismatch("rpIdHash does not match expected rpId")
   }
 
-  // Verify UP (user present) flag
-  if not(auth_data.flags.user_present) {
-    raise UserNotPresent
-  }
-
-  // Verify UV (user verified) flag if required
-  if options.require_user_verification && not(auth_data.flags.user_verified) {
-    raise UserVerificationRequired
+  // Verify UP/UV according to advanced FIDO config or default WebAuthn rules.
+  match options.advanced_fido_user_verification {
+    Some(@types.UserVerification::Required) =>
+      if not(auth_data.flags.user_verified) {
+        raise UserVerificationRequired
+      }
+    Some(@types.UserVerification::Preferred) => ()
+    Some(@types.UserVerification::Discouraged) => ()
+    None => {
+      if not(auth_data.flags.user_present) {
+        raise UserNotPresent
+      }
+      if options.require_user_verification && not(auth_data.flags.user_verified) {
+        raise UserVerificationRequired
+      }
+    }
   }
 }
 
@@ -362,19 +433,25 @@ fn verify_auth_authenticator_data(
 /// Note: This is a stub implementation. Real signature verification
 /// requires WebCrypto FFI which is not yet implemented.
 fn verify_signature(
-  _signed_data : Bytes,
-  _signature : Bytes,
-  _public_key : Bytes,
+  signed_data : Bytes,
+  signature : Bytes,
+  public_key : Bytes,
 ) -> Unit raise AuthenticationVerifyError {
-  // TODO: Implement actual signature verification with WebCrypto FFI
-  // For now, we raise an error to indicate this is not yet implemented
-  // In production, this would:
-  // 1. Parse the COSE public key
-  // 2. Parse the DER-encoded signature  
-  // 3. Verify using the appropriate algorithm (ES256, RS256, etc.)
-  raise SignatureVerificationFailed(
-    "Signature verification not yet implemented (requires WebCrypto FFI)",
-  )
+  let parsed_key = @crypto.parse_cose_ec2_key(public_key) catch {
+    @crypto.ECDSAError::InvalidPublicKey(msg) =>
+      raise InvalidPublicKey("Invalid COSE key: \{msg}")
+    @crypto.ECDSAError::UnsupportedAlgorithm(value) =>
+      raise InvalidPublicKey("Unsupported algorithm: \{value}")
+    @crypto.ECDSAError::InvalidSignature(msg) =>
+      raise InvalidPublicKey("Invalid signature: \{msg}")
+    @crypto.ECDSAError::VerificationFailed(msg) =>
+      raise InvalidPublicKey("Verification failed: \{msg}")
+  }
+
+  let is_valid = @crypto.verify_es256_sync(parsed_key, signature, signed_data)
+  if not(is_valid) {
+    raise SignatureVerificationFailed("Signature verification failed")
+  }
 }
 
 ///|

@@ -3,10 +3,13 @@ import {
   "f4ah6o/simple-webauthn/helpers" @helpers,
   "f4ah6o/simple-webauthn/crypto" @crypto,
   "moonbitlang/core/buffer" @buffer,
+  "moonbitlang/core/json",
   "moonbitlang/core/random" @random,
   "moonbitlang/x/encoding" @encoding,
+  "mizchi/cbor" @cbor,
+  "mizchi/js/core" @js,
 }
 
 import {
-  "mizchi/cbor" @cbor,
+  "moonbitlang/async",
 } for "test"

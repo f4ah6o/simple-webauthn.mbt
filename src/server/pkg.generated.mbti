@@ -3,14 +3,66 @@ package "f4ah6o/simple-webauthn/server"
 
 import {
   "f4ah6o/simple-webauthn/helpers",
+  "f4ah6o/simple-webauthn/types",
 }
 
 // Values
+pub fn clear_root_certificates(RootCertIdentifier) -> Unit
+
+pub fn generate_authentication_options(GenerateAuthenticationOptionsInput) -> @types.PublicKeyCredentialRequestOptionsJSON
+
+pub fn generate_registration_options(GenerateRegistrationOptionsInput) -> @types.PublicKeyCredentialCreationOptionsJSON
+
+pub fn get_root_certificates(RootCertIdentifier) -> Array[String]
+
+pub fn metadata_service_get_statement(String) -> MetadataStatement? raise MetadataServiceError
+
+pub fn metadata_service_get_statement_bytes(Bytes) -> MetadataStatement? raise MetadataServiceError
+
+pub async fn metadata_service_initialize(options? : MetadataServiceInitializeOptions?) -> Result[Unit, MetadataServiceError]
+
+pub async fn metadata_service_refresh() -> Result[Unit, MetadataServiceError]
+
+pub fn set_root_certificates(RootCertIdentifier, Array[String]) -> Unit
+
+pub fn verify_authentication_response(Bytes, Bytes, Bytes, Bytes, VerifyAuthenticationOptions) -> VerifiedAuthentication raise AuthenticationVerifyError
+
+pub async fn verify_authentication_response_async(Bytes, Bytes, Bytes, Bytes, VerifyAuthenticationOptions) -> Result[VerifiedAuthentication, AuthenticationVerifyError]
+
+pub fn verify_authentication_response_b64(String, String, String, String, VerifyAuthenticationOptions) -> VerifiedAuthentication raise AuthenticationVerifyError
+
+pub async fn verify_authentication_response_b64_async(String, String, String, String, VerifyAuthenticationOptions) -> Result[VerifiedAuthentication, AuthenticationVerifyError]
+
 pub fn verify_registration_response(Bytes, Bytes, VerifyRegistrationOptions) -> VerifiedRegistration raise RegistrationVerifyError
 
 pub fn verify_registration_response_b64(String, String, VerifyRegistrationOptions) -> VerifiedRegistration raise RegistrationVerifyError
 
 // Errors
+pub suberror AuthenticationVerifyError {
+  InvalidClientDataType(String)
+  ChallengeMismatch(String)
+  OriginMismatch(String)
+  RpIdHashMismatch(String)
+  UserNotPresent
+  UserVerificationRequired
+  CredentialNotAllowed(String)
+  SignatureVerificationFailed(String)
+  SignCountInvalid(String)
+  ClientDataParseError(String)
+  AuthenticatorDataParseError(String)
+  Base64DecodeError(String)
+  InvalidPublicKey(String)
+  ValidationError(String)
+}
+
+pub suberror MetadataServiceError {
+  FetchFailed(String)
+  InvalidJWT(String)
+  InvalidPayload(String)
+  StatementNotFound(String)
+  InvalidAAGUID(String)
+}
+
 pub suberror RegistrationVerifyError {
   InvalidClientDataType(String)
   ChallengeMismatch(String)
@@ -31,6 +83,127 @@ pub suberror RegistrationVerifyError {
 }
 
 // Types and methods
+pub struct AuthenticatorCredential {
+  credential_id : Bytes
+  public_key : Bytes
+  sign_count : UInt
+}
+pub fn AuthenticatorCredential::new(Bytes, Bytes, UInt) -> Self
+pub impl Eq for AuthenticatorCredential
+pub impl Show for AuthenticatorCredential
+
+pub struct GenerateAuthenticationOptionsInput {
+  rp_id : String?
+  challenge : Bytes?
+  timeout : Int?
+  allow_credentials : Array[@types.PublicKeyCredentialDescriptor]?
+  user_verification : @types.UserVerification?
+  hints : Array[@types.PublicKeyCredentialHint]?
+  extensions : Json?
+}
+pub fn GenerateAuthenticationOptionsInput::new(rp_id? : String?, challenge? : Bytes?, timeout? : Int?, allow_credentials? : Array[@types.PublicKeyCredentialDescriptor]?, user_verification? : @types.UserVerification?, hints? : Array[@types.PublicKeyCredentialHint]?, extensions? : Json?) -> Self
+pub impl Show for GenerateAuthenticationOptionsInput
+
+pub struct GenerateRegistrationOptionsInput {
+  rp_name : String
+  rp_id : String
+  user_name : String
+  user_id : Bytes?
+  user_display_name : String?
+  challenge : Bytes?
+  attestation : @types.AttestationConveyance?
+  exclude_credentials : Array[@types.PublicKeyCredentialDescriptor]?
+  authenticator_selection : @types.AuthenticatorSelectionCriteria?
+  supported_algorithm_ids : Array[Int]?
+  timeout : Int?
+  hints : Array[@types.PublicKeyCredentialHint]?
+  preferred_authenticator_type : PreferredAuthenticatorType?
+  extensions : Json?
+}
+pub fn GenerateRegistrationOptionsInput::new(String, String, String, user_id? : Bytes?, user_display_name? : String?, challenge? : Bytes?, attestation? : @types.AttestationConveyance?, exclude_credentials? : Array[@types.PublicKeyCredentialDescriptor]?, authenticator_selection? : @types.AuthenticatorSelectionCriteria?, supported_algorithm_ids? : Array[Int]?, timeout? : Int?, hints? : Array[@types.PublicKeyCredentialHint]?, preferred_authenticator_type? : PreferredAuthenticatorType?, extensions? : Json?) -> Self
+pub impl Show for GenerateRegistrationOptionsInput
+
+pub struct MetadataBlobEntry {
+  aaguid : String
+  metadata_statement : MetadataStatement
+  status_reports : Array[StatusReport]
+  time_of_last_status_change : String?
+}
+pub impl Eq for MetadataBlobEntry
+pub impl Show for MetadataBlobEntry
+
+pub struct MetadataServiceInitializeOptions {
+  mds_servers : Array[String]?
+  statements : Array[MetadataStatement]?
+  verification_mode : VerificationMode?
+}
+pub fn MetadataServiceInitializeOptions::new(mds_servers? : Array[String]?, statements? : Array[MetadataStatement]?, verification_mode? : VerificationMode?) -> Self
+pub impl Eq for MetadataServiceInitializeOptions
+pub impl Show for MetadataServiceInitializeOptions
+
+pub struct MetadataStatement {
+  aaguid : String
+  raw : Json
+}
+pub fn MetadataStatement::new(String, Json) -> Self
+pub impl Eq for MetadataStatement
+pub impl Show for MetadataStatement
+
+pub enum PreferredAuthenticatorType {
+  SecurityKey
+  LocalDevice
+  RemoteDevice
+}
+pub impl Eq for PreferredAuthenticatorType
+pub impl Show for PreferredAuthenticatorType
+
+pub(all) enum RootCertIdentifier {
+  NoneAttestation
+  Packed
+  FidoU2F
+  TPM
+  AndroidKey
+  AndroidSafetyNet
+  Apple
+  Mds
+}
+pub fn RootCertIdentifier::to_string(Self) -> String
+pub impl Eq for RootCertIdentifier
+pub impl Show for RootCertIdentifier
+
+pub enum SignCountPolicy {
+  Strict
+  AllowZero
+  Permissive
+}
+pub impl Eq for SignCountPolicy
+pub impl Show for SignCountPolicy
+
+pub struct StatusReport {
+  status : String
+  effective_date : String?
+  certificate : String?
+}
+pub impl Eq for StatusReport
+pub impl Show for StatusReport
+
+pub(all) enum VerificationMode {
+  Permissive
+  Strict
+}
+pub impl Eq for VerificationMode
+pub impl Show for VerificationMode
+
+pub struct VerifiedAuthentication {
+  credential_id : Bytes
+  new_sign_count : UInt
+  user_verified : Bool
+  backup_eligible : Bool
+  backup_state : Bool
+}
+pub impl Eq for VerifiedAuthentication
+pub impl Show for VerifiedAuthentication
+
 pub struct VerifiedRegistration {
   credential_id : Bytes
   credential_public_key : Bytes
@@ -45,15 +218,47 @@ pub struct VerifiedRegistration {
 pub impl Eq for VerifiedRegistration
 pub impl Show for VerifiedRegistration
 
+pub struct VerifyAuthenticationOptions {
+  expected_challenge : Bytes
+  expected_origins : Array[String]
+  expected_rp_id : String
+  expected_rp_ids : Array[String]?
+  expected_types : Array[String]?
+  require_user_verification : Bool
+  advanced_fido_user_verification : @types.UserVerification?
+  credential : AuthenticatorCredential
+  sign_count_policy : SignCountPolicy
+}
+pub fn VerifyAuthenticationOptions::new(Bytes, String, String, AuthenticatorCredential) -> Self
+pub fn VerifyAuthenticationOptions::require_user_verification(Self, Bool) -> Self
+pub fn VerifyAuthenticationOptions::with_advanced_fido_user_verification(Self, @types.UserVerification) -> Self
+pub fn VerifyAuthenticationOptions::with_expected_rp_ids(Self, Array[String]) -> Self
+pub fn VerifyAuthenticationOptions::with_expected_types(Self, Array[String]) -> Self
+pub fn VerifyAuthenticationOptions::with_origins(Bytes, Array[String], String, AuthenticatorCredential) -> Self
+pub fn VerifyAuthenticationOptions::with_sign_count_policy(Self, SignCountPolicy) -> Self
+pub fn VerifyAuthenticationOptions::with_sign_count_policy_permissive(Self) -> Self
+pub fn VerifyAuthenticationOptions::with_sign_count_policy_strict(Self) -> Self
+pub impl Eq for VerifyAuthenticationOptions
+pub impl Show for VerifyAuthenticationOptions
+
 pub struct VerifyRegistrationOptions {
   expected_challenge : Bytes
   expected_origins : Array[String]
   expected_rp_id : String
+  expected_rp_ids : Array[String]?
+  expected_types : Array[String]?
   require_user_verification : Bool
+  require_user_presence : Bool
+  attestation_safetynet_enforce_cts_check : Bool
 }
 pub fn VerifyRegistrationOptions::new(Bytes, String, String) -> Self
+pub fn VerifyRegistrationOptions::require_user_presence(Self, Bool) -> Self
 pub fn VerifyRegistrationOptions::require_user_verification(Self, Bool) -> Self
+pub fn VerifyRegistrationOptions::with_attestation_safetynet_enforce_cts_check(Self, Bool) -> Self
+pub fn VerifyRegistrationOptions::with_expected_rp_ids(Self, Array[String]) -> Self
+pub fn VerifyRegistrationOptions::with_expected_types(Self, Array[String]) -> Self
 pub fn VerifyRegistrationOptions::with_origins(Bytes, Array[String], String) -> Self
+pub fn VerifyRegistrationOptions::with_rp_ids(Bytes, Array[String], Array[String]) -> Self
 pub impl Eq for VerifyRegistrationOptions
 pub impl Show for VerifyRegistrationOptions
 
