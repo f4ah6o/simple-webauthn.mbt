@@ -1,12 +1,13 @@
 # simple-webauthn for MoonBit
 
-A WebAuthn (FIDO2/Passkey) server library for MoonBit, ported from [@simplewebauthn/server](https://github.com/MasterKale/SimpleWebAuthn).
+A WebAuthn (FIDO2/Passkey) library for MoonBit, ported from [SimpleWebAuthn](https://github.com/MasterKale/SimpleWebAuthn).
 
 ## Features
 
 - **Registration**: Generate options and verify registration responses
 - **Authentication**: Generate options and verify authentication responses  
 - **ES256 Signature Verification**: Real cryptographic verification via WebCrypto FFI
+- **Browser API**: Start registration/authentication ceremonies in JS runtimes
 - **Passkey Support**: Handles synced passkeys with flexible signCount policies
 - **Type-safe**: Full MoonBit type safety with detailed error types
 
@@ -110,6 +111,7 @@ let options = @server.VerifyAuthenticationOptions::new(...)
 
 ```
 src/
+├── browser/    # Browser-side API (start registration/authentication)
 ├── types/      # WebAuthn type definitions (COSE, credentials, etc.)
 ├── helpers/    # Parsing utilities (base64url, clientData, authenticatorData)
 ├── crypto/     # Cryptographic operations (SHA-256, ES256 via WebCrypto FFI)
@@ -129,10 +131,20 @@ src/
 - `verify_authentication_response_async(...)` - Verify with real ES256 signature verification
 - `verify_authentication_response(...)` - Sync version (signature verification stub)
 
+### Browser
+
+- `browser_supports_webauthn()` - Check if the runtime provides WebAuthn APIs
+- `platform_authenticator_is_available()` - Check for built-in platform authenticators
+- `browser_supports_webauthn_autofill()` - Check conditional UI/autofill support
+- `start_registration(input)` - Run browser registration and return `RegistrationResponseJSON`
+- `start_authentication(input)` - Run browser authentication and return `AuthenticationResponseJSON`
+- `cancel_ceremony()` - Abort an active browser WebAuthn ceremony
+
 ### Error Types
 
 - `RegistrationVerifyError` - Detailed registration failure reasons
 - `AuthenticationVerifyError` - Detailed authentication failure reasons
+- `BrowserError` - Browser-side ceremony and runtime errors
 
 ## Development
 
@@ -140,14 +152,13 @@ src/
 just           # check + test
 just fmt       # format code  
 just check     # type check
-just test      # run tests (61 tests)
+just test      # run tests
 ```
 
 ## Current Limitations
 
 - Only ES256 (P-256) signature verification implemented
 - Packed attestation verification not yet implemented (fmt="none" works)
-- Browser-side API (startRegistration/startAuthentication) not included
 
 ## License
 

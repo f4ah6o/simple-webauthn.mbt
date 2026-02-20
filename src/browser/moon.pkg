@@ -1,1 +1,10 @@
+import {
+  "f4ah6o/simple-webauthn/types" @types,
+  "f4ah6o/simple-webauthn/helpers" @helpers,
+  "moonbitlang/core/json" @json,
+  "mizchi/js/core" @js,
+}
 
+import {
+  "moonbitlang/async",
+} for "test"

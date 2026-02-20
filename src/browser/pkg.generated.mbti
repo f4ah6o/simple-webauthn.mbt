@@ -1,11 +1,56 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "f4ah6o/simple-webauthn/browser"
 
+import {
+  "f4ah6o/simple-webauthn/types",
+}
+
 // Values
+pub fn base64url_string_to_buffer(String) -> Bytes raise BrowserError
+
+pub fn browser_supports_webauthn() -> Bool
+
+pub async fn browser_supports_webauthn_autofill() -> Bool
+
+pub fn buffer_to_base64url_string(Bytes) -> String
+
+pub fn cancel_ceremony() -> Unit
+
+pub async fn platform_authenticator_is_available() -> Bool
+
+pub async fn start_authentication(StartAuthenticationInput) -> Result[@types.AuthenticationResponseJSON, BrowserError]
+
+pub async fn start_registration(StartRegistrationInput) -> Result[@types.RegistrationResponseJSON, BrowserError]
 
 // Errors
+pub suberror BrowserError {
+  NotSupported(String)
+  AutofillNotSupported(String)
+  MissingAutofillInput(String)
+  CeremonyAborted(String)
+  InvalidResponse(String)
+  InvalidInput(String)
+  DomError(String)
+  Unknown(String)
+}
 
 // Types and methods
+pub struct StartAuthenticationInput {
+  options_json : @types.PublicKeyCredentialRequestOptionsJSON
+  use_browser_autofill : Bool
+  verify_browser_autofill_input : Bool
+}
+pub fn StartAuthenticationInput::new(@types.PublicKeyCredentialRequestOptionsJSON, use_browser_autofill? : Bool, verify_browser_autofill_input? : Bool) -> Self
+pub impl Eq for StartAuthenticationInput
+pub impl Show for StartAuthenticationInput
+
+pub struct StartRegistrationInput {
+  options_json : @types.PublicKeyCredentialCreationOptionsJSON
+  use_auto_register : Bool
+}
+pub fn StartRegistrationInput::new(@types.PublicKeyCredentialCreationOptionsJSON, use_auto_register? : Bool) -> Self
+pub impl Eq for StartRegistrationInput
+pub impl Show for StartRegistrationInput
 
 // Type aliases
 
