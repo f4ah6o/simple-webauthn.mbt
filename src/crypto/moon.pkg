@@ -1,9 +1,9 @@
 import {
-  "f4ah6o/simple-webauthn/helpers" @helpers,
+  "f4ah6o/simple-webauthn/helpers",
   "moonbitlang/x/crypto" @xcrypto,
-  "moonbitlang/x/encoding" @encoding,
-  "mizchi/cbor",
-  "mizchi/js/core" @js,
+  "moonbitlang/x/encoding",
+  "f4ah6o/simple-webauthn/cbor",
+  "mizchi/js_core" @js,
 }
 
 import {

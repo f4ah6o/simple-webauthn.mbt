@@ -6,20 +6,20 @@ pub struct Base64URLString {
 
 ///|
 /// Serialize as a plain JSON string (not as an object with "value" field).
-pub impl ToJson for Base64URLString with to_json(self) {
+pub impl ToJson for Base64URLString with fn to_json(self) {
   self.value.to_json()
 }
 
 ///|
 /// Deserialize from a plain JSON string.
-pub impl FromJson for Base64URLString with from_json(json, path) {
+pub impl FromJson for Base64URLString with fn from_json(json, path) {
   let s : String = FromJson::from_json(json, path)
-  { value: s }
+  { value: s, }
 }
 
 ///|
 pub fn Base64URLString::new(s : String) -> Base64URLString {
-  { value: s }
+  { value: s, }
 }
 
 ///|
@@ -71,12 +71,12 @@ pub fn AuthenticatorTransport::from_string(
 }
 
 ///|
-pub impl ToJson for AuthenticatorTransport with to_json(self) {
+pub impl ToJson for AuthenticatorTransport with fn to_json(self) {
   self.to_string().to_json()
 }
 
 ///|
-pub impl FromJson for AuthenticatorTransport with from_json(json, path) {
+pub impl FromJson for AuthenticatorTransport with fn from_json(json, path) {
   let s : String = FromJson::from_json(json, path)
   match AuthenticatorTransport::from_string(s) {
     Some(t) => t
@@ -100,7 +100,7 @@ pub fn CredentialDeviceType::to_string(self : CredentialDeviceType) -> String {
 }
 
 ///|
-pub impl ToJson for CredentialDeviceType with to_json(self) {
+pub impl ToJson for CredentialDeviceType with fn to_json(self) {
   self.to_string().to_json()
 }
 
@@ -132,12 +132,12 @@ pub fn UserVerification::from_string(s : String) -> UserVerification? {
 }
 
 ///|
-pub impl ToJson for UserVerification with to_json(self) {
+pub impl ToJson for UserVerification with fn to_json(self) {
   self.to_string().to_json()
 }
 
 ///|
-pub impl FromJson for UserVerification with from_json(json, path) {
+pub impl FromJson for UserVerification with fn from_json(json, path) {
   let s : String = FromJson::from_json(json, path)
   match UserVerification::from_string(s) {
     Some(v) => v
@@ -176,12 +176,12 @@ pub fn AttestationConveyance::from_string(s : String) -> AttestationConveyance? 
 }
 
 ///|
-pub impl ToJson for AttestationConveyance with to_json(self) {
+pub impl ToJson for AttestationConveyance with fn to_json(self) {
   self.to_string().to_json()
 }
 
 ///|
-pub impl FromJson for AttestationConveyance with from_json(json, path) {
+pub impl FromJson for AttestationConveyance with fn from_json(json, path) {
   let s : String = FromJson::from_json(json, path)
   match AttestationConveyance::from_string(s) {
     Some(v) => v
@@ -230,7 +230,7 @@ pub fn AttestationFormat::from_string(s : String) -> AttestationFormat? {
 }
 
 ///|
-pub impl ToJson for AttestationFormat with to_json(self) {
+pub impl ToJson for AttestationFormat with fn to_json(self) {
   self.to_string().to_json()
 }
 
@@ -263,12 +263,12 @@ pub fn AuthenticatorAttachment::from_string(
 }
 
 ///|
-pub impl ToJson for AuthenticatorAttachment with to_json(self) {
+pub impl ToJson for AuthenticatorAttachment with fn to_json(self) {
   self.to_string().to_json()
 }
 
 ///|
-pub impl FromJson for AuthenticatorAttachment with from_json(json, path) {
+pub impl FromJson for AuthenticatorAttachment with fn from_json(json, path) {
   let s : String = FromJson::from_json(json, path)
   match AuthenticatorAttachment::from_string(s) {
     Some(v) => v
@@ -304,12 +304,12 @@ pub fn ResidentKey::from_string(s : String) -> ResidentKey? {
 }
 
 ///|
-pub impl ToJson for ResidentKey with to_json(self) {
+pub impl ToJson for ResidentKey with fn to_json(self) {
   self.to_string().to_json()
 }
 
 ///|
-pub impl FromJson for ResidentKey with from_json(json, path) {
+pub impl FromJson for ResidentKey with fn from_json(json, path) {
   let s : String = FromJson::from_json(json, path)
   match ResidentKey::from_string(s) {
     Some(v) => v
@@ -343,12 +343,12 @@ pub fn PublicKeyCredentialType::from_string(
 }
 
 ///|
-pub impl ToJson for PublicKeyCredentialType with to_json(self) {
+pub impl ToJson for PublicKeyCredentialType with fn to_json(self) {
   self.to_string().to_json()
 }
 
 ///|
-pub impl FromJson for PublicKeyCredentialType with from_json(json, path) {
+pub impl FromJson for PublicKeyCredentialType with fn from_json(json, path) {
   let s : String = FromJson::from_json(json, path)
   match PublicKeyCredentialType::from_string(s) {
     Some(v) => v
@@ -388,12 +388,12 @@ pub fn PublicKeyCredentialHint::from_string(
 }
 
 ///|
-pub impl ToJson for PublicKeyCredentialHint with to_json(self) {
+pub impl ToJson for PublicKeyCredentialHint with fn to_json(self) {
   self.to_string().to_json()
 }
 
 ///|
-pub impl FromJson for PublicKeyCredentialHint with from_json(json, path) {
+pub impl FromJson for PublicKeyCredentialHint with fn from_json(json, path) {
   let s : String = FromJson::from_json(json, path)
   match PublicKeyCredentialHint::from_string(s) {
     Some(v) => v

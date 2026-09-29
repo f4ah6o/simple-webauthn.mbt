@@ -221,7 +221,7 @@ pub fn VerifyRegistrationOptions::require_user_verification(
   self : VerifyRegistrationOptions,
   required : Bool,
 ) -> VerifyRegistrationOptions {
-  { ..self, require_user_verification: required }
+  { ..self, require_user_verification: required, }
 }
 
 ///|
@@ -230,7 +230,7 @@ pub fn VerifyRegistrationOptions::require_user_presence(
   self : VerifyRegistrationOptions,
   required : Bool,
 ) -> VerifyRegistrationOptions {
-  { ..self, require_user_presence: required }
+  { ..self, require_user_presence: required, }
 }
 
 ///|
@@ -239,7 +239,7 @@ pub fn VerifyRegistrationOptions::with_expected_types(
   self : VerifyRegistrationOptions,
   expected_types : Array[String],
 ) -> VerifyRegistrationOptions {
-  { ..self, expected_types: Some(expected_types) }
+  { ..self, expected_types: Some(expected_types), }
 }
 
 ///|
@@ -265,5 +265,5 @@ pub fn VerifyRegistrationOptions::with_attestation_safetynet_enforce_cts_check(
   self : VerifyRegistrationOptions,
   enforce : Bool,
 ) -> VerifyRegistrationOptions {
-  { ..self, attestation_safetynet_enforce_cts_check: enforce }
+  { ..self, attestation_safetynet_enforce_cts_check: enforce, }
 }

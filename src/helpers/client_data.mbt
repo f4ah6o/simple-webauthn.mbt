@@ -19,7 +19,10 @@ pub suberror ClientDataError {
 pub(all) enum ClientDataType {
   Create // "webauthn.create" for registration
   Get // "webauthn.get" for authentication
-} derive(Show, Eq)
+} derive(Show, Eq, Debug)
+
+///|
+pub extend ClientDataType with @moonbitlang/core/debug.Debug::{to_repr}
 
 ///|
 fn ClientDataType::to_string(self : ClientDataType) -> String {
@@ -122,7 +125,7 @@ pub fn parse_client_data_json_value(
   }
   // Parse tokenBinding (optional)
   let token_binding = obj.get("tokenBinding")
-  { type_, challenge, challenge_raw, origin, cross_origin, token_binding }
+  { type_, challenge, challenge_raw, origin, cross_origin, token_binding, }
 }
 
 ///|

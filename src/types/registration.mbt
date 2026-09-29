@@ -57,7 +57,7 @@ pub fn PublicKeyCredentialCreationOptionsJSON::new(
 }
 
 ///|
-pub impl ToJson for PublicKeyCredentialCreationOptionsJSON with to_json(self) {
+pub impl ToJson for PublicKeyCredentialCreationOptionsJSON with fn to_json(self) {
   let obj : Map[String, Json] = {}
   obj["rp"] = self.rp.to_json()
   obj["user"] = self.user.to_json()
@@ -98,7 +98,7 @@ pub impl ToJson for PublicKeyCredentialCreationOptionsJSON with to_json(self) {
 }
 
 ///|
-pub impl FromJson for PublicKeyCredentialCreationOptionsJSON with from_json(
+pub impl FromJson for PublicKeyCredentialCreationOptionsJSON with fn from_json(
   json,
   path,
 ) {
@@ -174,7 +174,7 @@ pub struct AuthenticatorAttestationResponseJSON {
 } derive(Show, Eq)
 
 ///|
-pub impl ToJson for AuthenticatorAttestationResponseJSON with to_json(self) {
+pub impl ToJson for AuthenticatorAttestationResponseJSON with fn to_json(self) {
   let obj : Map[String, Json] = {}
   obj["clientDataJSON"] = self.client_data_json.to_json()
   obj["attestationObject"] = self.attestation_object.to_json()
@@ -198,7 +198,7 @@ pub impl ToJson for AuthenticatorAttestationResponseJSON with to_json(self) {
 }
 
 ///|
-pub impl FromJson for AuthenticatorAttestationResponseJSON with from_json(
+pub impl FromJson for AuthenticatorAttestationResponseJSON with fn from_json(
   json,
   path,
 ) {
@@ -262,7 +262,7 @@ pub struct RegistrationResponseJSON {
 } derive(Show, Eq)
 
 ///|
-pub impl ToJson for RegistrationResponseJSON with to_json(self) {
+pub impl ToJson for RegistrationResponseJSON with fn to_json(self) {
   let obj : Map[String, Json] = {}
   obj["id"] = self.id.to_json()
   obj["rawId"] = self.raw_id.to_json()
@@ -277,7 +277,7 @@ pub impl ToJson for RegistrationResponseJSON with to_json(self) {
 }
 
 ///|
-pub impl FromJson for RegistrationResponseJSON with from_json(json, path) {
+pub impl FromJson for RegistrationResponseJSON with fn from_json(json, path) {
   guard json is Object(obj) else {
     raise JsonDecodeError(
       (path, "Expected object for RegistrationResponseJSON"),

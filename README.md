@@ -13,15 +13,32 @@ A WebAuthn (FIDO2/Passkey) library for MoonBit, ported from [SimpleWebAuthn](htt
 
 ## Installation
 
-Add to your `moon.mod.json`:
+Add the package with the current `moon` CLI:
 
-```json
-{
-  "deps": {
-    "f4ah6o/simple-webauthn": "0.1.0"
-  }
+```bash
+moon add f4ah6o/simple-webauthn@0.2.0
+```
+
+### Migration from 0.1.x
+
+Version 0.2.0 vendors the CBOR implementation because the published
+`mizchi/cbor@0.1.1` source is incompatible with the current MoonBit compiler.
+`AttestationObject.att_stmt` therefore changes from `mizchi/cbor.CborValue` to
+`f4ah6o/simple-webauthn/cbor.CborValue`. Downstream code that directly imports
+the CBOR package should upgrade the dependency and replace the import in its
+`moon.pkg` with:
+
+```bash
+moon add --upgrade f4ah6o/simple-webauthn@0.2.0
+```
+
+```moonbit
+import {
+  "f4ah6o/simple-webauthn/cbor" @cbor,
 }
 ```
+
+The WebAuthn verification APIs and validation behavior are unchanged.
 
 ## Quick Start
 
@@ -162,4 +179,4 @@ just test      # run tests
 
 ## License
 
-Apache-2.0
+Project source: Apache-2.0. The vendored CBOR implementation and tests are MIT-licensed; see `LICENSE-MIT` and `NOTICE`.

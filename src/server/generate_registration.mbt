@@ -191,21 +191,30 @@ pub fn generate_registration_options(
   }
 
   match input.preferred_authenticator_type {
-    Some(PreferredAuthenticatorType::SecurityKey) => {
-      if not(hints.iter().any(fn(h) { h == @types.PublicKeyCredentialHint::SecurityKey })) {
+    Some(PreferredAuthenticatorType::SecurityKey) =>
+      if not(
+          hints
+          .iter()
+          .any(fn(h) { h == @types.PublicKeyCredentialHint::SecurityKey }),
+        ) {
         hints.push(@types.PublicKeyCredentialHint::SecurityKey)
       }
-    }
-    Some(PreferredAuthenticatorType::LocalDevice) => {
-      if not(hints.iter().any(fn(h) { h == @types.PublicKeyCredentialHint::ClientDevice })) {
+    Some(PreferredAuthenticatorType::LocalDevice) =>
+      if not(
+          hints
+          .iter()
+          .any(fn(h) { h == @types.PublicKeyCredentialHint::ClientDevice }),
+        ) {
         hints.push(@types.PublicKeyCredentialHint::ClientDevice)
       }
-    }
-    Some(PreferredAuthenticatorType::RemoteDevice) => {
-      if not(hints.iter().any(fn(h) { h == @types.PublicKeyCredentialHint::Hybrid })) {
+    Some(PreferredAuthenticatorType::RemoteDevice) =>
+      if not(
+          hints
+          .iter()
+          .any(fn(h) { h == @types.PublicKeyCredentialHint::Hybrid }),
+        ) {
         hints.push(@types.PublicKeyCredentialHint::Hybrid)
       }
-    }
     None => ()
   }
 

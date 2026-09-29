@@ -41,12 +41,9 @@ pub struct EC2PublicKey {
   x : Bytes
   y : Bytes
   alg : Int
-}
+} derive(Eq, Show)
 pub fn EC2PublicKey::new(Bytes, Bytes, Int) -> Self
-pub impl Eq for EC2PublicKey
-pub impl Show for EC2PublicKey
 
 // Type aliases
 
 // Traits
-

@@ -184,7 +184,7 @@ fn parse_attested_credential_data(
     _ => raise InvalidPublicKey("Public key too short")
   }
   let total_length = 16 + 2 + cred_id_len_int + pk_len
-  { aaguid, credential_id, credential_public_key, length: total_length }
+  { aaguid, credential_id, credential_public_key, length: total_length, }
 }
 
 ///|

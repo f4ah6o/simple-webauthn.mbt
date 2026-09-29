@@ -4,6 +4,7 @@ package "f4ah6o/simple-webauthn/server"
 import {
   "f4ah6o/simple-webauthn/helpers",
   "f4ah6o/simple-webauthn/types",
+  "moonbitlang/core/debug",
 }
 
 // Values
@@ -87,10 +88,8 @@ pub struct AuthenticatorCredential {
   credential_id : Bytes
   public_key : Bytes
   sign_count : UInt
-}
+} derive(Eq, Show)
 pub fn AuthenticatorCredential::new(Bytes, Bytes, UInt) -> Self
-pub impl Eq for AuthenticatorCredential
-pub impl Show for AuthenticatorCredential
 
 pub struct GenerateAuthenticationOptionsInput {
   rp_id : String?
@@ -100,9 +99,8 @@ pub struct GenerateAuthenticationOptionsInput {
   user_verification : @types.UserVerification?
   hints : Array[@types.PublicKeyCredentialHint]?
   extensions : Json?
-}
+} derive(Show)
 pub fn GenerateAuthenticationOptionsInput::new(rp_id? : String?, challenge? : Bytes?, timeout? : Int?, allow_credentials? : Array[@types.PublicKeyCredentialDescriptor]?, user_verification? : @types.UserVerification?, hints? : Array[@types.PublicKeyCredentialHint]?, extensions? : Json?) -> Self
-pub impl Show for GenerateAuthenticationOptionsInput
 
 pub struct GenerateRegistrationOptionsInput {
   rp_name : String
@@ -119,43 +117,35 @@ pub struct GenerateRegistrationOptionsInput {
   hints : Array[@types.PublicKeyCredentialHint]?
   preferred_authenticator_type : PreferredAuthenticatorType?
   extensions : Json?
-}
+} derive(Show)
 pub fn GenerateRegistrationOptionsInput::new(String, String, String, user_id? : Bytes?, user_display_name? : String?, challenge? : Bytes?, attestation? : @types.AttestationConveyance?, exclude_credentials? : Array[@types.PublicKeyCredentialDescriptor]?, authenticator_selection? : @types.AuthenticatorSelectionCriteria?, supported_algorithm_ids? : Array[Int]?, timeout? : Int?, hints? : Array[@types.PublicKeyCredentialHint]?, preferred_authenticator_type? : PreferredAuthenticatorType?, extensions? : Json?) -> Self
-pub impl Show for GenerateRegistrationOptionsInput
 
 pub struct MetadataBlobEntry {
   aaguid : String
   metadata_statement : MetadataStatement
   status_reports : Array[StatusReport]
   time_of_last_status_change : String?
-}
-pub impl Eq for MetadataBlobEntry
-pub impl Show for MetadataBlobEntry
+} derive(Eq, Show)
 
 pub struct MetadataServiceInitializeOptions {
   mds_servers : Array[String]?
   statements : Array[MetadataStatement]?
   verification_mode : VerificationMode?
-}
+} derive(Eq, Show)
 pub fn MetadataServiceInitializeOptions::new(mds_servers? : Array[String]?, statements? : Array[MetadataStatement]?, verification_mode? : VerificationMode?) -> Self
-pub impl Eq for MetadataServiceInitializeOptions
-pub impl Show for MetadataServiceInitializeOptions
 
 pub struct MetadataStatement {
   aaguid : String
   raw : Json
-}
+} derive(Eq, Show, @debug.Debug)
 pub fn MetadataStatement::new(String, Json) -> Self
-pub impl Eq for MetadataStatement
-pub impl Show for MetadataStatement
+pub fn MetadataStatement::to_repr(Self) -> @debug.Repr
 
 pub enum PreferredAuthenticatorType {
   SecurityKey
   LocalDevice
   RemoteDevice
-}
-pub impl Eq for PreferredAuthenticatorType
-pub impl Show for PreferredAuthenticatorType
+} derive(Eq, Show)
 
 pub(all) enum RootCertIdentifier {
   NoneAttestation
@@ -166,33 +156,25 @@ pub(all) enum RootCertIdentifier {
   AndroidSafetyNet
   Apple
   Mds
-}
+} derive(Eq, Show)
 pub fn RootCertIdentifier::to_string(Self) -> String
-pub impl Eq for RootCertIdentifier
-pub impl Show for RootCertIdentifier
 
 pub enum SignCountPolicy {
   Strict
   AllowZero
   Permissive
-}
-pub impl Eq for SignCountPolicy
-pub impl Show for SignCountPolicy
+} derive(Eq, Show)
 
 pub struct StatusReport {
   status : String
   effective_date : String?
   certificate : String?
-}
-pub impl Eq for StatusReport
-pub impl Show for StatusReport
+} derive(Eq, Show)
 
 pub(all) enum VerificationMode {
   Permissive
   Strict
-}
-pub impl Eq for VerificationMode
-pub impl Show for VerificationMode
+} derive(Eq, Show)
 
 pub struct VerifiedAuthentication {
   credential_id : Bytes
@@ -200,9 +182,7 @@ pub struct VerifiedAuthentication {
   user_verified : Bool
   backup_eligible : Bool
   backup_state : Bool
-}
-pub impl Eq for VerifiedAuthentication
-pub impl Show for VerifiedAuthentication
+} derive(Eq, Show)
 
 pub struct VerifiedRegistration {
   credential_id : Bytes
@@ -214,9 +194,7 @@ pub struct VerifiedRegistration {
   aaguid : Bytes
   attestation_format : @helpers.AttestationFormat
   attestation_verified : Bool
-}
-pub impl Eq for VerifiedRegistration
-pub impl Show for VerifiedRegistration
+} derive(Eq, Show)
 
 pub struct VerifyAuthenticationOptions {
   expected_challenge : Bytes
@@ -228,7 +206,7 @@ pub struct VerifyAuthenticationOptions {
   advanced_fido_user_verification : @types.UserVerification?
   credential : AuthenticatorCredential
   sign_count_policy : SignCountPolicy
-}
+} derive(Eq, Show)
 pub fn VerifyAuthenticationOptions::new(Bytes, String, String, AuthenticatorCredential) -> Self
 pub fn VerifyAuthenticationOptions::require_user_verification(Self, Bool) -> Self
 pub fn VerifyAuthenticationOptions::with_advanced_fido_user_verification(Self, @types.UserVerification) -> Self
@@ -238,8 +216,6 @@ pub fn VerifyAuthenticationOptions::with_origins(Bytes, Array[String], String, A
 pub fn VerifyAuthenticationOptions::with_sign_count_policy(Self, SignCountPolicy) -> Self
 pub fn VerifyAuthenticationOptions::with_sign_count_policy_permissive(Self) -> Self
 pub fn VerifyAuthenticationOptions::with_sign_count_policy_strict(Self) -> Self
-pub impl Eq for VerifyAuthenticationOptions
-pub impl Show for VerifyAuthenticationOptions
 
 pub struct VerifyRegistrationOptions {
   expected_challenge : Bytes
@@ -250,7 +226,7 @@ pub struct VerifyRegistrationOptions {
   require_user_verification : Bool
   require_user_presence : Bool
   attestation_safetynet_enforce_cts_check : Bool
-}
+} derive(Eq, Show)
 pub fn VerifyRegistrationOptions::new(Bytes, String, String) -> Self
 pub fn VerifyRegistrationOptions::require_user_presence(Self, Bool) -> Self
 pub fn VerifyRegistrationOptions::require_user_verification(Self, Bool) -> Self
@@ -259,10 +235,7 @@ pub fn VerifyRegistrationOptions::with_expected_rp_ids(Self, Array[String]) -> S
 pub fn VerifyRegistrationOptions::with_expected_types(Self, Array[String]) -> Self
 pub fn VerifyRegistrationOptions::with_origins(Bytes, Array[String], String) -> Self
 pub fn VerifyRegistrationOptions::with_rp_ids(Bytes, Array[String], Array[String]) -> Self
-pub impl Eq for VerifyRegistrationOptions
-pub impl Show for VerifyRegistrationOptions
 
 // Type aliases
 
 // Traits
-

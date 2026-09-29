@@ -53,7 +53,7 @@ pub fn AuthenticatorCredential::new(
   public_key : Bytes,
   sign_count : UInt,
 ) -> AuthenticatorCredential {
-  { credential_id, public_key, sign_count }
+  { credential_id, public_key, sign_count, }
 }
 
 ///|
@@ -128,7 +128,7 @@ pub fn VerifyAuthenticationOptions::require_user_verification(
   self : VerifyAuthenticationOptions,
   required : Bool,
 ) -> VerifyAuthenticationOptions {
-  { ..self, require_user_verification: required }
+  { ..self, require_user_verification: required, }
 }
 
 ///|
@@ -137,7 +137,7 @@ pub fn VerifyAuthenticationOptions::with_expected_types(
   self : VerifyAuthenticationOptions,
   expected_types : Array[String],
 ) -> VerifyAuthenticationOptions {
-  { ..self, expected_types: Some(expected_types) }
+  { ..self, expected_types: Some(expected_types), }
 }
 
 ///|
@@ -163,7 +163,7 @@ pub fn VerifyAuthenticationOptions::with_advanced_fido_user_verification(
   self : VerifyAuthenticationOptions,
   mode : @types.UserVerification,
 ) -> VerifyAuthenticationOptions {
-  { ..self, advanced_fido_user_verification: Some(mode) }
+  { ..self, advanced_fido_user_verification: Some(mode), }
 }
 
 ///|
@@ -178,7 +178,7 @@ pub fn VerifyAuthenticationOptions::with_sign_count_policy(
   self : VerifyAuthenticationOptions,
   policy : SignCountPolicy,
 ) -> VerifyAuthenticationOptions {
-  { ..self, sign_count_policy: policy }
+  { ..self, sign_count_policy: policy, }
 }
 
 ///|
@@ -186,7 +186,7 @@ pub fn VerifyAuthenticationOptions::with_sign_count_policy(
 pub fn VerifyAuthenticationOptions::with_sign_count_policy_strict(
   self : VerifyAuthenticationOptions,
 ) -> VerifyAuthenticationOptions {
-  { ..self, sign_count_policy: SignCountPolicy::Strict }
+  { ..self, sign_count_policy: SignCountPolicy::Strict, }
 }
 
 ///|
@@ -194,7 +194,7 @@ pub fn VerifyAuthenticationOptions::with_sign_count_policy_strict(
 pub fn VerifyAuthenticationOptions::with_sign_count_policy_permissive(
   self : VerifyAuthenticationOptions,
 ) -> VerifyAuthenticationOptions {
-  { ..self, sign_count_policy: SignCountPolicy::Permissive }
+  { ..self, sign_count_policy: SignCountPolicy::Permissive, }
 }
 
 ///|
@@ -400,10 +400,12 @@ fn verify_auth_authenticator_data(
     Some(ids) if ids.length() > 0 => ids
     _ => [options.expected_rp_id]
   }
-  let rp_id_matches = rp_ids.iter().any(fn(rp_id) {
-    let expected_hash = @crypto.hash_rp_id(rp_id)
-    @helpers.constant_time_equal(auth_data.rp_id_hash, expected_hash)
-  })
+  let rp_id_matches = rp_ids
+    .iter()
+    .any(fn(rp_id) {
+      let expected_hash = @crypto.hash_rp_id(rp_id)
+      @helpers.constant_time_equal(auth_data.rp_id_hash, expected_hash)
+    })
   if not(rp_id_matches) {
     raise RpIdHashMismatch("rpIdHash does not match expected rpId")
   }

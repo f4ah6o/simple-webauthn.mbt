@@ -2,8 +2,9 @@
 package "f4ah6o/simple-webauthn/helpers"
 
 import {
+  "f4ah6o/simple-webauthn/cbor",
   "f4ah6o/simple-webauthn/types",
-  "mizchi/cbor",
+  "moonbitlang/core/debug",
 }
 
 // Values
@@ -122,29 +123,23 @@ pub enum AttestationFormat {
   FidoU2F
   Apple
   Unknown(String)
-}
+} derive(Eq, Show)
 pub fn AttestationFormat::from_string(String) -> Self
 pub fn AttestationFormat::to_string(Self) -> String
-pub impl Eq for AttestationFormat
-pub impl Show for AttestationFormat
 
 pub struct AttestationObject {
   fmt : AttestationFormat
   att_stmt : @cbor.CborValue
   auth_data_raw : Bytes
   auth_data : AuthenticatorData
-}
-pub impl Eq for AttestationObject
-pub impl Show for AttestationObject
+} derive(Eq, Show)
 
 pub struct AttestedCredentialData {
   aaguid : Bytes
   credential_id : Bytes
   credential_public_key : Bytes
   length : Int
-}
-pub impl Eq for AttestedCredentialData
-pub impl Show for AttestedCredentialData
+} derive(Eq, Show)
 
 pub struct AuthFlags {
   user_present : Bool
@@ -154,9 +149,7 @@ pub struct AuthFlags {
   attested_credential_data : Bool
   extension_data : Bool
   raw : Byte
-}
-pub impl Eq for AuthFlags
-pub impl Show for AuthFlags
+} derive(Eq, Show)
 
 pub struct AuthenticatorData {
   rp_id_hash : Bytes
@@ -165,9 +158,7 @@ pub struct AuthenticatorData {
   attested_credential_data : AttestedCredentialData?
   extensions : Bytes?
   length : Int
-}
-pub impl Eq for AuthenticatorData
-pub impl Show for AuthenticatorData
+} derive(Eq, Show)
 
 pub struct ClientData {
   type_ : ClientDataType
@@ -176,18 +167,14 @@ pub struct ClientData {
   origin : String
   cross_origin : Bool
   token_binding : Json?
-}
-pub impl Eq for ClientData
-pub impl Show for ClientData
+} derive(Eq, Show)
 
 pub(all) enum ClientDataType {
   Create
   Get
-}
-pub impl Eq for ClientDataType
-pub impl Show for ClientDataType
+} derive(Eq, Show, @debug.Debug)
+pub fn ClientDataType::to_repr(Self) -> @debug.Repr
 
 // Type aliases
 
 // Traits
-

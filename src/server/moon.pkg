@@ -1,13 +1,13 @@
 import {
-  "f4ah6o/simple-webauthn/types" @types,
-  "f4ah6o/simple-webauthn/helpers" @helpers,
-  "f4ah6o/simple-webauthn/crypto" @crypto,
-  "moonbitlang/core/buffer" @buffer,
+  "f4ah6o/simple-webauthn/types",
+  "f4ah6o/simple-webauthn/helpers",
+  "f4ah6o/simple-webauthn/crypto",
+  "moonbitlang/core/buffer",
   "moonbitlang/core/json",
-  "moonbitlang/core/random" @random,
-  "moonbitlang/x/encoding" @encoding,
-  "mizchi/cbor" @cbor,
-  "mizchi/js/core" @js,
+  "moonbitlang/core/random",
+  "moonbitlang/x/encoding",
+  "f4ah6o/simple-webauthn/cbor",
+  "mizchi/js_core" @js,
 }
 
 import {

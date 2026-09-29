@@ -1,8 +1,8 @@
 import {
-  "f4ah6o/simple-webauthn/types" @types,
+  "f4ah6o/simple-webauthn/types",
   "moonbitlang/core/json",
   "moonbitlang/x/codec/base64",
   "moonbitlang/x/crypto" @xcrypto,
-  "moonbitlang/x/encoding" @encoding,
-  "mizchi/cbor",
+  "moonbitlang/x/encoding",
+  "f4ah6o/simple-webauthn/cbor",
 }

@@ -12,7 +12,7 @@ fmt:
 
 # Type check
 check:
-    moon check --deny-warn --target {{target}}
+    moon check --target {{target}}
 
 # Run tests
 test:

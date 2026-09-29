@@ -80,12 +80,12 @@ pub fn COSEAlgorithm::from_int(n : Int) -> COSEAlgorithm? {
 }
 
 ///|
-pub impl ToJson for COSEAlgorithm with to_json(self) {
+pub impl ToJson for COSEAlgorithm with fn to_json(self) {
   self.to_int().to_json()
 }
 
 ///|
-pub impl FromJson for COSEAlgorithm with from_json(json, path) {
+pub impl FromJson for COSEAlgorithm with fn from_json(json, path) {
   let n : Int = FromJson::from_json(json, path)
   match COSEAlgorithm::from_int(n) {
     Some(v) => v

@@ -17,7 +17,7 @@ pub struct RelyingParty {
 ///|
 /// Create a new RelyingParty.
 pub fn RelyingParty::new(name : String, id? : String? = None) -> RelyingParty {
-  { id, name }
+  { id, name, }
 }
 
 ///|
@@ -35,11 +35,11 @@ pub fn PublicKeyCredentialUserEntity::new(
   name : String,
   display_name : String,
 ) -> PublicKeyCredentialUserEntity {
-  { id, name, display_name }
+  { id, name, display_name, }
 }
 
 ///|
-pub impl ToJson for PublicKeyCredentialUserEntity with to_json(self) {
+pub impl ToJson for PublicKeyCredentialUserEntity with fn to_json(self) {
   let obj : Map[String, Json] = {}
   obj["id"] = self.id.to_json()
   obj["name"] = self.name.to_json()
@@ -48,14 +48,17 @@ pub impl ToJson for PublicKeyCredentialUserEntity with to_json(self) {
 }
 
 ///|
-pub impl FromJson for PublicKeyCredentialUserEntity with from_json(json, path) {
+pub impl FromJson for PublicKeyCredentialUserEntity with fn from_json(
+  json,
+  path,
+) {
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected object"))
   }
   let id : String = FromJson::from_json(obj["id"], path)
   let name : String = FromJson::from_json(obj["name"], path)
   let display_name : String = FromJson::from_json(obj["displayName"], path)
-  { id, name, display_name }
+  { id, name, display_name, }
 }
 
 ///|
@@ -70,11 +73,11 @@ pub struct PublicKeyCredentialParameters {
 pub fn PublicKeyCredentialParameters::new(
   alg : COSEAlgorithm,
 ) -> PublicKeyCredentialParameters {
-  { type_: PublicKeyCredentialType::PublicKey, alg }
+  { type_: PublicKeyCredentialType::PublicKey, alg, }
 }
 
 ///|
-pub impl ToJson for PublicKeyCredentialParameters with to_json(self) {
+pub impl ToJson for PublicKeyCredentialParameters with fn to_json(self) {
   let obj : Map[String, Json] = {}
   obj["type"] = self.type_.to_json()
   obj["alg"] = self.alg.to_json()
@@ -82,13 +85,16 @@ pub impl ToJson for PublicKeyCredentialParameters with to_json(self) {
 }
 
 ///|
-pub impl FromJson for PublicKeyCredentialParameters with from_json(json, path) {
+pub impl FromJson for PublicKeyCredentialParameters with fn from_json(
+  json,
+  path,
+) {
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected object"))
   }
   let type_ : PublicKeyCredentialType = FromJson::from_json(obj["type"], path)
   let alg : COSEAlgorithm = FromJson::from_json(obj["alg"], path)
-  { type_, alg }
+  { type_, alg, }
 }
 
 ///|
@@ -105,11 +111,11 @@ pub fn PublicKeyCredentialDescriptor::new(
   id : Base64URLString,
   transports? : Array[AuthenticatorTransport]? = None,
 ) -> PublicKeyCredentialDescriptor {
-  { id, type_: PublicKeyCredentialType::PublicKey, transports }
+  { id, type_: PublicKeyCredentialType::PublicKey, transports, }
 }
 
 ///|
-pub impl ToJson for PublicKeyCredentialDescriptor with to_json(self) {
+pub impl ToJson for PublicKeyCredentialDescriptor with fn to_json(self) {
   let obj : Map[String, Json] = {}
   obj["id"] = self.id.to_json()
   obj["type"] = self.type_.to_json()
@@ -121,7 +127,10 @@ pub impl ToJson for PublicKeyCredentialDescriptor with to_json(self) {
 }
 
 ///|
-pub impl FromJson for PublicKeyCredentialDescriptor with from_json(json, path) {
+pub impl FromJson for PublicKeyCredentialDescriptor with fn from_json(
+  json,
+  path,
+) {
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected object"))
   }
@@ -132,7 +141,7 @@ pub impl FromJson for PublicKeyCredentialDescriptor with from_json(json, path) {
     Some(t) => Some(FromJson::from_json(t, path))
     None => None
   }
-  { id, type_, transports }
+  { id, type_, transports, }
 }
 
 ///|
@@ -145,7 +154,7 @@ pub struct AuthenticatorSelectionCriteria {
 } derive(Show, Eq)
 
 ///|
-pub impl ToJson for AuthenticatorSelectionCriteria with to_json(self) {
+pub impl ToJson for AuthenticatorSelectionCriteria with fn to_json(self) {
   let obj : Map[String, Json] = {}
   match self.authenticator_attachment {
     Some(a) => obj["authenticatorAttachment"] = a.to_json()
@@ -167,7 +176,10 @@ pub impl ToJson for AuthenticatorSelectionCriteria with to_json(self) {
 }
 
 ///|
-pub impl FromJson for AuthenticatorSelectionCriteria with from_json(json, path) {
+pub impl FromJson for AuthenticatorSelectionCriteria with fn from_json(
+  json,
+  path,
+) {
   guard json is Object(obj) else {
     raise JsonDecodeError((path, "Expected object"))
   }

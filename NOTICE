@@ -1,0 +1,9 @@
+This project contains CBOR code derived from mizchi/cbor:
+
+  https://github.com/mizchi/cbor.mbt
+  Upstream commit: ff8cbbcf2e8b945510fbe76bd6183657065f74bc
+  Copyright (c) 2025 mizchi
+  License: MIT (see LICENSE-MIT)
+
+The vendored source was adjusted for the current MoonBit toolchain and is
+covered by the upstream MIT license.

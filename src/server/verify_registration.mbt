@@ -146,9 +146,7 @@ fn parse_and_verify_client_data(
   match options.expected_types {
     Some(expected_types) =>
       if not(expected_types.iter().any(fn(t) { t == actual_type })) {
-        raise InvalidClientDataType(
-          "Unexpected type '\{actual_type}'",
-        )
+        raise InvalidClientDataType("Unexpected type '\{actual_type}'")
       }
     None =>
       if actual_type != "webauthn.create" {
@@ -191,10 +189,12 @@ fn verify_authenticator_data(
     Some(ids) if ids.length() > 0 => ids
     _ => [options.expected_rp_id]
   }
-  let rp_id_matches = rp_ids.iter().any(fn(rp_id) {
-    let expected_hash = @crypto.hash_rp_id(rp_id)
-    @helpers.constant_time_equal(auth_data.rp_id_hash, expected_hash)
-  })
+  let rp_id_matches = rp_ids
+    .iter()
+    .any(fn(rp_id) {
+      let expected_hash = @crypto.hash_rp_id(rp_id)
+      @helpers.constant_time_equal(auth_data.rp_id_hash, expected_hash)
+    })
   if not(rp_id_matches) {
     raise RpIdHashMismatch("rpIdHash does not match expected rpId")
   }
@@ -261,7 +261,8 @@ fn verify_attestation(
   credential_public_key : Bytes,
 ) -> Bool raise RegistrationVerifyError {
   match att_obj.fmt {
-    @helpers.AttestationFormat::None => verify_none_attestation(att_obj.att_stmt)
+    @helpers.AttestationFormat::None =>
+      verify_none_attestation(att_obj.att_stmt)
     @helpers.AttestationFormat::Packed =>
       verify_packed_attestation(
         att_obj.att_stmt,
@@ -270,23 +271,17 @@ fn verify_attestation(
         credential_public_key,
       )
     @helpers.AttestationFormat::FidoU2F =>
-      verify_attestation_has_required_fields(
-        "fido-u2f",
-        att_obj.att_stmt,
-        ["sig", "x5c"],
-      )
+      verify_attestation_has_required_fields("fido-u2f", att_obj.att_stmt, [
+        "sig", "x5c",
+      ])
     @helpers.AttestationFormat::TPM =>
-      verify_attestation_has_required_fields(
-        "tpm",
-        att_obj.att_stmt,
-        ["ver", "sig", "certInfo", "pubArea"],
-      )
+      verify_attestation_has_required_fields("tpm", att_obj.att_stmt, [
+        "ver", "sig", "certInfo", "pubArea",
+      ])
     @helpers.AttestationFormat::AndroidKey =>
-      verify_attestation_has_required_fields(
-        "android-key",
-        att_obj.att_stmt,
-        ["sig", "x5c"],
-      )
+      verify_attestation_has_required_fields("android-key", att_obj.att_stmt, [
+        "sig", "x5c",
+      ])
     @helpers.AttestationFormat::AndroidSafetyNet =>
       verify_attestation_has_required_fields(
         "android-safetynet",
@@ -294,18 +289,16 @@ fn verify_attestation(
         ["response"],
       )
     @helpers.AttestationFormat::Apple =>
-      verify_attestation_has_required_fields(
-        "apple",
-        att_obj.att_stmt,
-        ["x5c"],
-      )
+      verify_attestation_has_required_fields("apple", att_obj.att_stmt, ["x5c"])
     @helpers.AttestationFormat::Unknown(fmt) =>
       raise UnsupportedAttestationFormat(fmt)
   }
 }
 
 ///|
-fn verify_none_attestation(att_stmt : @cbor.CborValue) -> Bool raise RegistrationVerifyError {
+fn verify_none_attestation(
+  att_stmt : @cbor.CborValue,
+) -> Bool raise RegistrationVerifyError {
   match att_stmt {
     @cbor.CborValue::VMap(entries) =>
       if entries.length() == 0 {
@@ -315,7 +308,8 @@ fn verify_none_attestation(att_stmt : @cbor.CborValue) -> Bool raise Registratio
           "none attestation must have empty attStmt",
         )
       }
-    _ => raise AttestationSignatureInvalid("none attestation attStmt must be map")
+    _ =>
+      raise AttestationSignatureInvalid("none attestation attStmt must be map")
   }
 }
 
@@ -356,7 +350,9 @@ fn verify_packed_attestation(
   let signed_data = @crypto.create_signed_data(auth_data_raw, client_data_json)
   let verified = @crypto.verify_es256_sync(cose_key, sig, signed_data)
   if not(verified) {
-    raise AttestationSignatureInvalid("packed attestation signature verification failed")
+    raise AttestationSignatureInvalid(
+      "packed attestation signature verification failed",
+    )
   }
   true
 }
@@ -397,7 +393,9 @@ fn att_stmt_has_key(
   entries : Array[(@cbor.CborValue, @cbor.CborValue)],
   key_name : String,
 ) -> Bool {
-  entries.iter().any(fn(entry) {
+  entries
+  .iter()
+  .any(fn(entry) {
     let (key, _value) = entry
     match key {
       @cbor.CborValue::VString(s) => s == key_name

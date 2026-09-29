@@ -1,0 +1,87 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "f4ah6o/simple-webauthn/cbor"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn decode(Bytes) -> CborValue raise CborError
+
+pub fn decode_bool(Bytes) -> Bool raise CborError
+
+pub fn decode_bytes(Bytes) -> Bytes raise CborError
+
+pub fn decode_double(Bytes) -> Double raise CborError
+
+pub fn decode_int(Bytes) -> Int64 raise CborError
+
+pub fn decode_string(Bytes) -> String raise CborError
+
+pub fn encode(CborValue) -> Bytes
+
+pub fn encode_bool(Bool) -> Bytes
+
+pub fn encode_bytes(Bytes) -> Bytes
+
+pub fn encode_double(Double) -> Bytes
+
+pub fn encode_int(Int64) -> Bytes
+
+pub fn encode_null() -> Bytes
+
+pub fn encode_string(String) -> Bytes
+
+pub fn encode_uint(UInt64) -> Bytes
+
+pub fn varray(Array[CborValue]) -> CborValue
+
+pub fn vbool(Bool) -> CborValue
+
+pub fn vbytes(Bytes) -> CborValue
+
+pub fn vdouble(Double) -> CborValue
+
+pub fn vint(Int64) -> CborValue
+
+pub fn vmap(Array[(CborValue, CborValue)]) -> CborValue
+
+pub fn vnull() -> CborValue
+
+pub fn vstring(String) -> CborValue
+
+pub fn vtag(UInt64, CborValue) -> CborValue
+
+pub fn vuint(UInt64) -> CborValue
+
+pub fn vundefined() -> CborValue
+
+// Errors
+pub suberror CborError {
+  CborError(String)
+}
+
+// Types and methods
+pub enum CborValue {
+  VUInt(UInt64)
+  VInt(Int64)
+  VBytes(Bytes)
+  VString(String)
+  VArray(Array[CborValue])
+  VMap(Array[(CborValue, CborValue)])
+  VTag(UInt64, CborValue)
+  VBool(Bool)
+  VNull
+  VUndefined
+  VDouble(Double)
+} derive(Eq, @debug.Debug)
+pub fn CborValue::equal(Self, Self) -> Bool
+pub fn CborValue::not_equal(Self, Self) -> Bool
+pub fn CborValue::output(Self, &Logger) -> Unit
+pub fn CborValue::to_repr(Self) -> @debug.Repr
+pub fn CborValue::to_string(Self) -> String
+pub impl Show for CborValue
+
+// Type aliases
+
+// Traits

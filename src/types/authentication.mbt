@@ -41,7 +41,7 @@ pub fn PublicKeyCredentialRequestOptionsJSON::new(
 }
 
 ///|
-pub impl ToJson for PublicKeyCredentialRequestOptionsJSON with to_json(self) {
+pub impl ToJson for PublicKeyCredentialRequestOptionsJSON with fn to_json(self) {
   let obj : Map[String, Json] = {}
   obj["challenge"] = self.challenge.to_json()
   match self.timeout {
@@ -72,7 +72,7 @@ pub impl ToJson for PublicKeyCredentialRequestOptionsJSON with to_json(self) {
 }
 
 ///|
-pub impl FromJson for PublicKeyCredentialRequestOptionsJSON with from_json(
+pub impl FromJson for PublicKeyCredentialRequestOptionsJSON with fn from_json(
   json,
   path,
 ) {
@@ -130,7 +130,7 @@ pub struct AuthenticatorAssertionResponseJSON {
 } derive(Show, Eq)
 
 ///|
-pub impl ToJson for AuthenticatorAssertionResponseJSON with to_json(self) {
+pub impl ToJson for AuthenticatorAssertionResponseJSON with fn to_json(self) {
   let obj : Map[String, Json] = {}
   obj["clientDataJSON"] = self.client_data_json.to_json()
   obj["authenticatorData"] = self.authenticator_data.to_json()
@@ -143,7 +143,7 @@ pub impl ToJson for AuthenticatorAssertionResponseJSON with to_json(self) {
 }
 
 ///|
-pub impl FromJson for AuthenticatorAssertionResponseJSON with from_json(
+pub impl FromJson for AuthenticatorAssertionResponseJSON with fn from_json(
   json,
   path,
 ) {
@@ -166,7 +166,7 @@ pub impl FromJson for AuthenticatorAssertionResponseJSON with from_json(
     Some(uh) => Some(FromJson::from_json(uh, path))
     None => None
   }
-  { client_data_json, authenticator_data, signature, user_handle }
+  { client_data_json, authenticator_data, signature, user_handle, }
 }
 
 ///|
@@ -187,7 +187,7 @@ pub struct AuthenticationResponseJSON {
 } derive(Show, Eq)
 
 ///|
-pub impl ToJson for AuthenticationResponseJSON with to_json(self) {
+pub impl ToJson for AuthenticationResponseJSON with fn to_json(self) {
   let obj : Map[String, Json] = {}
   obj["id"] = self.id.to_json()
   obj["rawId"] = self.raw_id.to_json()
@@ -202,7 +202,7 @@ pub impl ToJson for AuthenticationResponseJSON with to_json(self) {
 }
 
 ///|
-pub impl FromJson for AuthenticationResponseJSON with from_json(json, path) {
+pub impl FromJson for AuthenticationResponseJSON with fn from_json(json, path) {
   guard json is Object(obj) else {
     raise JsonDecodeError(
       (path, "Expected object for AuthenticationResponseJSON"),

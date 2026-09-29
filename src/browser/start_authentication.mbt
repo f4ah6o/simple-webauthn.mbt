@@ -11,7 +11,7 @@ pub fn StartAuthenticationInput::new(
   use_browser_autofill? : Bool = false,
   verify_browser_autofill_input? : Bool = true,
 ) -> StartAuthenticationInput {
-  { options_json, use_browser_autofill, verify_browser_autofill_input }
+  { options_json, use_browser_autofill, verify_browser_autofill_input, }
 }
 
 ///|

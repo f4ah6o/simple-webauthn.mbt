@@ -529,7 +529,12 @@ test "generate_registration_options_basic" {
   let options = @server.generate_registration_options(input)
   // Check RP
   inspect(options.rp.name, content="ACME Corp")
-  inspect(options.rp.id, content="Some(\"example.com\")")
+  inspect(
+    options.rp.id,
+    content=(
+      #|Some(example.com)
+    ),
+  )
   // Check user
   inspect(options.user.name, content="johndoe")
   inspect(options.user.display_name, content="johndoe") // defaults to user_name
@@ -633,17 +638,42 @@ test "generate_registration_options_json_output" {
   guard json is Json::Object(obj) else { panic() }
   // Check rp
   guard obj["rp"] is Json::Object(rp) else { panic() }
-  inspect(rp["name"], content="String(\"ACME Corp\")")
-  inspect(rp["id"], content="String(\"example.com\")")
+  inspect(
+    rp["name"],
+    content=(
+      #|String(ACME Corp)
+    ),
+  )
+  inspect(
+    rp["id"],
+    content=(
+      #|String(example.com)
+    ),
+  )
   // Check user
   guard obj["user"] is Json::Object(user) else { panic() }
-  inspect(user["name"], content="String(\"johndoe\")")
-  inspect(user["displayName"], content="String(\"John Doe\")")
+  inspect(
+    user["name"],
+    content=(
+      #|String(johndoe)
+    ),
+  )
+  inspect(
+    user["displayName"],
+    content=(
+      #|String(John Doe)
+    ),
+  )
   // Check pubKeyCredParams
   guard obj["pubKeyCredParams"] is Json::Array(params) else { panic() }
   assert_eq(params.length(), 1)
   guard params[0] is Json::Object(param) else { panic() }
-  inspect(param["type"], content="String(\"public-key\")")
+  inspect(
+    param["type"],
+    content=(
+      #|String(public-key)
+    ),
+  )
   inspect(param["alg"], content="Number(-7)")
 }
 
@@ -675,7 +705,12 @@ test "generate_authentication_options_with_rp_id" {
     rp_id=Some("example.com"),
   )
   let options = @server.generate_authentication_options(input)
-  inspect(options.rp_id, content="Some(\"example.com\")")
+  inspect(
+    options.rp_id,
+    content=(
+      #|Some(example.com)
+    ),
+  )
 }
 
 ///|
@@ -744,11 +779,21 @@ test "generate_authentication_options_json_output" {
   // Verify JSON structure
   guard json is Json::Object(obj) else { panic() }
   // Check rpId
-  inspect(obj["rpId"], content="String(\"example.com\")")
+  inspect(
+    obj["rpId"],
+    content=(
+      #|String(example.com)
+    ),
+  )
   // Check timeout
   inspect(obj["timeout"], content="Number(60000)")
   // Check userVerification
-  inspect(obj["userVerification"], content="String(\"required\")")
+  inspect(
+    obj["userVerification"],
+    content=(
+      #|String(required)
+    ),
+  )
   // Check challenge is base64url encoded
   guard obj["challenge"] is Json::String(_) else { panic() }
 }
@@ -1188,9 +1233,7 @@ test "sign_count_policy_with_origins" {
 test "verify_registration_with_expected_types_override" {
   let challenge_b64 = @helpers.base64url_encode(b"test-challenge")
   let client_data = make_client_data_json(
-    "webauthn.get",
-    challenge_b64,
-    "https://example.com",
+    "webauthn.get", challenge_b64, "https://example.com",
   )
   let attestation_obj = make_attestation_object_none(
     make_auth_data(
@@ -1202,15 +1245,11 @@ test "verify_registration_with_expected_types_override" {
     ),
   )
   let options = @server.VerifyRegistrationOptions::new(
-    b"test-challenge",
-    "https://example.com",
-    "example.com",
+    b"test-challenge", "https://example.com", "example.com",
   ).with_expected_types(["webauthn.get"])
 
   let result = @server.verify_registration_response(
-    client_data,
-    attestation_obj,
-    options,
+    client_data, attestation_obj, options,
   ) catch {
     _ => panic()
   }
@@ -1221,9 +1260,7 @@ test "verify_registration_with_expected_types_override" {
 test "verify_authentication_with_expected_types_override" {
   let challenge_b64 = @helpers.base64url_encode(b"test-challenge")
   let client_data = make_client_data_json(
-    "webauthn.create",
-    challenge_b64,
-    "https://example.com",
+    "webauthn.create", challenge_b64, "https://example.com",
   )
   let auth_data = make_auth_data_assertion("example.com", b'\x01', 1U)
   let credential = make_test_credential(
@@ -1232,19 +1269,12 @@ test "verify_authentication_with_expected_types_override" {
     0U,
   )
   let options = @server.VerifyAuthenticationOptions::new(
-    b"test-challenge",
-    "https://example.com",
-    "example.com",
-    credential,
+    b"test-challenge", "https://example.com", "example.com", credential,
   ).with_expected_types(["webauthn.create"])
 
   let result = try {
     let _ = @server.verify_authentication_response(
-      b"test-credential-id",
-      client_data,
-      auth_data,
-      b"fake-signature",
-      options,
+      b"test-credential-id", client_data, auth_data, b"fake-signature", options,
     )
     Ok(())
   } catch {
@@ -1261,10 +1291,9 @@ test "verify_authentication_with_expected_types_override" {
 
 ///|
 test "settings_service_set_get_clear" {
-  @server.set_root_certificates(
-    @server.RootCertIdentifier::Apple,
-    ["cert-a", "cert-b"],
-  )
+  @server.set_root_certificates(@server.RootCertIdentifier::Apple, [
+    "cert-a", "cert-b",
+  ])
   let certs = @server.get_root_certificates(@server.RootCertIdentifier::Apple)
   assert_eq(certs.length(), 2)
   assert_eq(certs[0], "cert-a")
@@ -1282,11 +1311,13 @@ async test "metadata_service_local_statement_strict" {
     Json::object({ "description": "local-test".to_json() }),
   )
   let init_result = @server.metadata_service_initialize(
-    options=Some(@server.MetadataServiceInitializeOptions::new(
-      mds_servers=Some([]),
-      statements=Some([statement]),
-      verification_mode=Some(@server.VerificationMode::Strict),
-    )),
+    options=Some(
+      @server.MetadataServiceInitializeOptions::new(
+        mds_servers=Some([]),
+        statements=Some([statement]),
+        verification_mode=Some(@server.VerificationMode::Strict),
+      ),
+    ),
   )
   guard init_result is Ok(_) else { panic() }
 
@@ -1300,10 +1331,12 @@ async test "metadata_service_local_statement_strict" {
 ///|
 async test "metadata_service_missing_statement_strict_errors" {
   let init_result = @server.metadata_service_initialize(
-    options=Some(@server.MetadataServiceInitializeOptions::new(
-      mds_servers=Some([]),
-      verification_mode=Some(@server.VerificationMode::Strict),
-    )),
+    options=Some(
+      @server.MetadataServiceInitializeOptions::new(
+        mds_servers=Some([]),
+        verification_mode=Some(@server.VerificationMode::Strict),
+      ),
+    ),
   )
   guard init_result is Ok(_) else { panic() }
 
@@ -1313,7 +1346,8 @@ async test "metadata_service_missing_statement_strict_errors" {
     )
     Ok(())
   } catch {
-    @server.MetadataServiceError::StatementNotFound(_) => Err("StatementNotFound")
+    @server.MetadataServiceError::StatementNotFound(_) =>
+      Err("StatementNotFound")
     _ => Err("OtherError")
   }
   assert_eq(result, Err("StatementNotFound"))
@@ -1322,10 +1356,12 @@ async test "metadata_service_missing_statement_strict_errors" {
 ///|
 async test "metadata_service_missing_statement_permissive" {
   let init_result = @server.metadata_service_initialize(
-    options=Some(@server.MetadataServiceInitializeOptions::new(
-      mds_servers=Some([]),
-      verification_mode=Some(@server.VerificationMode::Permissive),
-    )),
+    options=Some(
+      @server.MetadataServiceInitializeOptions::new(
+        mds_servers=Some([]),
+        verification_mode=Some(@server.VerificationMode::Permissive),
+      ),
+    ),
   )
   guard init_result is Ok(_) else { panic() }
 

@@ -40,7 +40,7 @@ pub struct EC2PublicKey {
 /// 
 /// For P-256 (ES256), both x and y must be 32 bytes.
 pub fn EC2PublicKey::new(x : Bytes, y : Bytes, alg : Int) -> EC2PublicKey {
-  { x, y, alg }
+  { x, y, alg, }
 }
 
 ///|
@@ -162,7 +162,7 @@ pub fn parse_cose_ec2_key(cose_key : Bytes) -> EC2PublicKey raise ECDSAError {
   if y.length() != 32 {
     raise InvalidPublicKey("y coordinate must be 32 bytes, got \{y.length()}")
   }
-  { x, y, alg: algorithm }
+  { x, y, alg: algorithm, }
 }
 
 ///|

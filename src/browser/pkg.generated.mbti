@@ -39,20 +39,15 @@ pub struct StartAuthenticationInput {
   options_json : @types.PublicKeyCredentialRequestOptionsJSON
   use_browser_autofill : Bool
   verify_browser_autofill_input : Bool
-}
+} derive(Eq, Show)
 pub fn StartAuthenticationInput::new(@types.PublicKeyCredentialRequestOptionsJSON, use_browser_autofill? : Bool, verify_browser_autofill_input? : Bool) -> Self
-pub impl Eq for StartAuthenticationInput
-pub impl Show for StartAuthenticationInput
 
 pub struct StartRegistrationInput {
   options_json : @types.PublicKeyCredentialCreationOptionsJSON
   use_auto_register : Bool
-}
+} derive(Eq, Show)
 pub fn StartRegistrationInput::new(@types.PublicKeyCredentialCreationOptionsJSON, use_auto_register? : Bool) -> Self
-pub impl Eq for StartRegistrationInput
-pub impl Show for StartRegistrationInput
 
 // Type aliases
 
 // Traits
-

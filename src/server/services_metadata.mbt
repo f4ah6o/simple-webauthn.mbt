@@ -42,14 +42,14 @@ pub fn RootCertIdentifier::to_string(self : RootCertIdentifier) -> String {
 pub struct MetadataStatement {
   aaguid : String
   raw : Json
-} derive(Show, Eq)
+} derive(Show, Eq, Debug)
 
 ///|
-pub fn MetadataStatement::new(
-  aaguid : String,
-  raw : Json,
-) -> MetadataStatement {
-  { aaguid, raw }
+pub extend MetadataStatement with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub fn MetadataStatement::new(aaguid : String, raw : Json) -> MetadataStatement {
+  { aaguid, raw, }
 }
 
 ///|
@@ -83,7 +83,7 @@ pub fn MetadataServiceInitializeOptions::new(
   statements? : Array[MetadataStatement]? = None,
   verification_mode? : VerificationMode? = None,
 ) -> MetadataServiceInitializeOptions {
-  { mds_servers, statements, verification_mode }
+  { mds_servers, statements, verification_mode, }
 }
 
 ///|
@@ -103,9 +103,7 @@ priv struct SettingsServiceState {
 }
 
 ///|
-let settings_service_state : SettingsServiceState = {
-  root_certs: {},
-}
+let settings_service_state : SettingsServiceState = { root_certs: {}, }
 
 ///|
 /// Replace root certificates for one identifier.
@@ -118,9 +116,7 @@ pub fn set_root_certificates(
 
 ///|
 /// Read configured root certificates for one identifier.
-pub fn get_root_certificates(
-  identifier : RootCertIdentifier,
-) -> Array[String] {
+pub fn get_root_certificates(identifier : RootCertIdentifier) -> Array[String] {
   match settings_service_state.root_certs.get(identifier.to_string()) {
     Some(certs) => certs
     None => []
@@ -191,7 +187,8 @@ pub async fn metadata_service_initialize(
     let fetch_text = ffi_fetch_text(url).wait() catch { _ => None }
     let jwt = match fetch_text {
       Some(text) => text
-      None => return Err(FetchFailed("Failed to fetch metadata BLOB from \{url}"))
+      None =>
+        return Err(FetchFailed("Failed to fetch metadata BLOB from \{url}"))
     }
     let payload_str = match ffi_extract_jwt_payload(jwt) {
       Some(v) => v
@@ -213,10 +210,12 @@ pub async fn metadata_service_initialize(
 /// Refresh metadata from previously configured servers.
 pub async fn metadata_service_refresh() -> Result[Unit, MetadataServiceError] {
   metadata_service_initialize(
-    options=Some(MetadataServiceInitializeOptions::new(
-      mds_servers=Some(metadata_service_state.mds_servers),
-      verification_mode=Some(metadata_service_state.verification_mode),
-    )),
+    options=Some(
+      MetadataServiceInitializeOptions::new(
+        mds_servers=Some(metadata_service_state.mds_servers),
+        verification_mode=Some(metadata_service_state.verification_mode),
+      ),
+    ),
   )
 }
 
@@ -244,9 +243,7 @@ pub fn metadata_service_get_statement(
 pub fn metadata_service_get_statement_bytes(
   aaguid : Bytes,
 ) -> MetadataStatement? raise MetadataServiceError {
-  let aaguid_str = aaguid_bytes_to_string(aaguid) catch {
-    err => raise err
-  }
+  let aaguid_str = aaguid_bytes_to_string(aaguid) catch { err => raise err }
   metadata_service_get_statement(aaguid_str)
 }
 
@@ -319,14 +316,15 @@ fn parse_blob_entry(entry_json : Json) -> MetadataBlobEntry? {
   }
 
   let status_reports = parse_status_reports(entry_obj.get("statusReports"))
-  let time_of_last_status_change = match entry_obj.get("timeOfLastStatusChange") {
+  let time_of_last_status_change = match
+    entry_obj.get("timeOfLastStatusChange") {
     Some(Json::String(v)) => Some(v)
     _ => None
   }
 
   Some({
     aaguid,
-    metadata_statement: { aaguid, raw: metadata_raw },
+    metadata_statement: { aaguid, raw: metadata_raw, },
     status_reports,
     time_of_last_status_change,
   })
@@ -351,7 +349,7 @@ fn parse_status_reports(value : Json?) -> Array[StatusReport] {
           Some(Json::String(v)) => Some(v)
           _ => None
         }
-        reports.push({ status, effective_date, certificate })
+        reports.push({ status, effective_date, certificate, })
       }
       reports
     }

@@ -1,8 +1,8 @@
 import {
-  "f4ah6o/simple-webauthn/types" @types,
-  "f4ah6o/simple-webauthn/helpers" @helpers,
-  "moonbitlang/core/json" @json,
-  "mizchi/js/core" @js,
+  "f4ah6o/simple-webauthn/types",
+  "f4ah6o/simple-webauthn/helpers",
+  "moonbitlang/core/json",
+  "mizchi/js_core" @js,
 }
 
 import {
