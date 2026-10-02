@@ -63,6 +63,8 @@ pub struct VerifyAuthenticationOptions {
   expected_challenge : Bytes
   /// Expected origin(s) - at least one must match
   expected_origins : Array[String]
+  /// Expected top-level origin(s) for cross-origin authentication
+  expected_top_origins : Array[String]?
   /// Expected rpId (hashed and compared with authenticatorData.rpIdHash)
   expected_rp_id : String
   /// Optional additional expected rpIds (at least one hash must match)
@@ -91,6 +93,7 @@ pub fn VerifyAuthenticationOptions::new(
   {
     expected_challenge: challenge,
     expected_origins: [origin],
+    expected_top_origins: None,
     expected_rp_id: rp_id,
     expected_rp_ids: None,
     expected_types: None,
@@ -99,6 +102,24 @@ pub fn VerifyAuthenticationOptions::new(
     credential,
     sign_count_policy: SignCountPolicy::AllowZero,
   }
+}
+
+///|
+/// Require one of the configured top-level origins for cross-origin authentication.
+pub fn VerifyAuthenticationOptions::with_expected_top_origin(
+  self : VerifyAuthenticationOptions,
+  expected_top_origin : String,
+) -> VerifyAuthenticationOptions {
+  { ..self, expected_top_origins: Some([expected_top_origin]), }
+}
+
+///|
+/// Require one of the configured top-level origins for cross-origin authentication.
+pub fn VerifyAuthenticationOptions::with_expected_top_origins(
+  self : VerifyAuthenticationOptions,
+  expected_top_origins : Array[String],
+) -> VerifyAuthenticationOptions {
+  { ..self, expected_top_origins: Some(expected_top_origins), }
 }
 
 ///|
@@ -112,6 +133,7 @@ pub fn VerifyAuthenticationOptions::with_origins(
   {
     expected_challenge: challenge,
     expected_origins: origins,
+    expected_top_origins: None,
     expected_rp_id: rp_id,
     expected_rp_ids: None,
     expected_types: None,
@@ -375,6 +397,17 @@ fn parse_and_verify_auth_client_data(
       ),
     ) {
     raise ChallengeMismatch("Challenge does not match expected value")
+  }
+
+  // Verify the top-level origin when the browser reports cross-origin use.
+  match
+    top_origin_error_message(
+      client_data.cross_origin,
+      client_data.top_origin,
+      options.expected_top_origins,
+    ) {
+    Some(message) => raise ValidationError(message)
+    None => ()
   }
 
   // Verify origin

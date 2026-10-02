@@ -1,0 +1,54 @@
+name: Mutation testing
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mutation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Install MoonBit CLI
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | MOONBIT_INSTALL_VERSION="0.10.14+7d59c7ec9" bash
+          "$HOME/.moon/bin/moon" version --all
+          case "$("$HOME/.moon/bin/moon" version)" in
+            "moon 0.1.20260920 (914d7da "*) ;;
+            *) echo "Unexpected Moon CLI build" >&2; exit 1 ;;
+          esac
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+      - name: Resolve dependencies
+        run: moon update
+      - name: Install pinned turtles
+        run: moon install https://github.com/f4ah6o/turtles.git cmd/turtles --rev 4d9baaa258c695e803a487283076e979e2c260ba
+      - name: Run JS mutation gate
+        run: turtles --dir . --target js --jobs 2 --fail-under 100 --json .turtles/report.json
+      - name: Verify campaign covers both policy files
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('.turtles/report.json').read_text())
+          assert report['schema'] == 3 and report['target'] == 'js'
+          summary = report['summary']
+          assert summary['killed'] > 0
+          assert summary['survived'] == 0 and summary['timeout'] == 0
+          killed_paths = {m['path'] for m in report['mutants'] if m['outcome'] == 'KILLED'}
+          assert {'src/server/top_origin.mbt', 'src/browser/capabilities.mbt'} <= killed_paths
+          PY
+      - name: Upload mutation report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: turtles-js-report
+          path: .turtles/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 14

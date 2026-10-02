@@ -1,0 +1,4 @@
+# The first mutation gate covers the MoonBit decisions added during v14 tracking.
+# JS FFI and the older verification/parser code are outside this bounded campaign.
+include = ["src/server/top_origin.mbt", "src/browser/capabilities.mbt"]
+operators = ["comparison", "boolean", "arithmetic", "literal", "condition", "body"]

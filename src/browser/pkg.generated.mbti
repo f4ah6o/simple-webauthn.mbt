@@ -3,10 +3,13 @@ package "f4ah6o/simple-webauthn/browser"
 
 import {
   "f4ah6o/simple-webauthn/types",
+  "moonbitlang/core/debug",
 }
 
 // Values
 pub fn base64url_string_to_buffer(String) -> Bytes raise BrowserError
+
+pub async fn browser_supports_passkeys() -> Bool
 
 pub fn browser_supports_webauthn() -> Bool
 
@@ -15,6 +18,8 @@ pub async fn browser_supports_webauthn_autofill() -> Bool
 pub fn buffer_to_base64url_string(Bytes) -> String
 
 pub fn cancel_ceremony() -> Unit
+
+pub async fn get_browser_capabilities() -> BrowserCapabilities
 
 pub async fn platform_authenticator_is_available() -> Bool
 
@@ -35,6 +40,25 @@ pub suberror BrowserError {
 }
 
 // Types and methods
+pub(all) struct BrowserCapabilities {
+  conditional_create : BrowserCapabilitySupport
+  conditional_get : BrowserCapabilitySupport
+  hybrid_transport : BrowserCapabilitySupport
+  passkey_platform_authenticator : BrowserCapabilitySupport
+  user_verifying_platform_authenticator : BrowserCapabilitySupport
+  related_origins : BrowserCapabilitySupport
+  signal_all_accepted_credentials : BrowserCapabilitySupport
+  signal_current_user_details : BrowserCapabilitySupport
+  signal_unknown_credential : BrowserCapabilitySupport
+} derive(Eq, @debug.Debug)
+pub fn BrowserCapabilities::unknown() -> Self
+
+pub(all) enum BrowserCapabilitySupport {
+  Supported
+  Unsupported
+  Unknown
+} derive(Eq, @debug.Debug)
+
 pub struct StartAuthenticationInput {
   options_json : @types.PublicKeyCredentialRequestOptionsJSON
   use_browser_autofill : Bool

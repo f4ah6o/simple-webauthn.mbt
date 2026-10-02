@@ -54,6 +54,8 @@ pub struct ClientData {
   origin : String
   /// Whether this is a cross-origin request
   cross_origin : Bool
+  /// Top-level origin for cross-origin requests, when provided by the browser
+  top_origin : String?
   /// Token binding (optional, rarely used)
   token_binding : Json?
 } derive(Show, Eq)
@@ -123,9 +125,23 @@ pub fn parse_client_data_json_value(
     Some(_) => false // Invalid value, treat as false
     None => false
   }
+  // Parse topOrigin (optional, absent in some browsers such as Safari)
+  let top_origin = match obj.get("topOrigin") {
+    Some(String(s)) => Some(s)
+    Some(Null) | None => None
+    Some(_) => raise InvalidOrigin
+  }
   // Parse tokenBinding (optional)
   let token_binding = obj.get("tokenBinding")
-  { type_, challenge, challenge_raw, origin, cross_origin, token_binding, }
+  {
+    type_,
+    challenge,
+    challenge_raw,
+    origin,
+    cross_origin,
+    top_origin,
+    token_binding,
+  }
 }
 
 ///|
