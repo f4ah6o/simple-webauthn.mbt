@@ -17,7 +17,12 @@ jobs:
       - uses: actions/checkout@v7.0.1
       - name: Install MoonBit CLI
         run: |
-          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | MOONBIT_INSTALL_VERSION="0.1.20260920" bash
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | MOONBIT_INSTALL_VERSION="0.10.14+7d59c7ec9" bash
+          "$HOME/.moon/bin/moon" version --all
+          case "$("$HOME/.moon/bin/moon" version)" in
+            "moon 0.1.20260920 (914d7da "*) ;;
+            *) echo "Unexpected Moon CLI build" >&2; exit 1 ;;
+          esac
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
       - name: Install pinned turtles
         run: moon install https://github.com/f4ah6o/turtles.git cmd/turtles --rev 4d9baaa258c695e803a487283076e979e2c260ba

@@ -7,10 +7,12 @@ tests separately exercise the capability API bridge.
 
 ## Reproduce
 
-Use MoonBit `0.1.20260920` and turtles commit
+Use MoonBit compiler `0.10.14+7d59c7ec9` (Moon CLI `0.1.20260920`, build
+`914d7da`) and turtles commit
 `4d9baaa258c695e803a487283076e979e2c260ba` (`turtles --version`: `0.3.0`):
 
 ```sh
+curl -fsSL https://cli.moonbitlang.com/install/unix.sh | MOONBIT_INSTALL_VERSION="0.10.14+7d59c7ec9" bash
 moon install https://github.com/f4ah6o/turtles.git cmd/turtles --rev 4d9baaa258c695e803a487283076e979e2c260ba
 moon update
 turtles --dir . --target js --list
