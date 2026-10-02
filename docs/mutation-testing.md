@@ -13,8 +13,8 @@ Use MoonBit compiler `0.10.14+7d59c7ec9` (Moon CLI `0.1.20260920`, build
 
 ```sh
 curl -fsSL https://cli.moonbitlang.com/install/unix.sh | MOONBIT_INSTALL_VERSION="0.10.14+7d59c7ec9" bash
-moon install https://github.com/f4ah6o/turtles.git cmd/turtles --rev 4d9baaa258c695e803a487283076e979e2c260ba
 moon update
+moon install https://github.com/f4ah6o/turtles.git cmd/turtles --rev 4d9baaa258c695e803a487283076e979e2c260ba
 turtles --dir . --target js --list
 turtles --dir . --target js --jobs 2 --fail-under 100 --json .turtles/report.json
 ```

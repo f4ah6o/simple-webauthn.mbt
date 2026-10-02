@@ -24,10 +24,10 @@ jobs:
             *) echo "Unexpected Moon CLI build" >&2; exit 1 ;;
           esac
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
-      - name: Install pinned turtles
-        run: moon install https://github.com/f4ah6o/turtles.git cmd/turtles --rev 4d9baaa258c695e803a487283076e979e2c260ba
       - name: Resolve dependencies
         run: moon update
+      - name: Install pinned turtles
+        run: moon install https://github.com/f4ah6o/turtles.git cmd/turtles --rev 4d9baaa258c695e803a487283076e979e2c260ba
       - name: Run JS mutation gate
         run: turtles --dir . --target js --jobs 2 --fail-under 100 --json .turtles/report.json
       - name: Verify campaign covers both policy files
