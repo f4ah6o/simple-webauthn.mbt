@@ -166,6 +166,7 @@ pub struct ClientData {
   challenge_raw : String
   origin : String
   cross_origin : Bool
+  top_origin : String?
   token_binding : Json?
 } derive(Eq, Show)
 

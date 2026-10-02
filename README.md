@@ -153,6 +153,8 @@ src/
 - `browser_supports_webauthn()` - Check if the runtime provides WebAuthn APIs
 - `platform_authenticator_is_available()` - Check for built-in platform authenticators
 - `browser_supports_webauthn_autofill()` - Check conditional UI/autofill support
+- `get_browser_capabilities()` - Read nine WebAuthn capabilities as supported, unsupported, or unknown
+- `browser_supports_passkeys()` - Check platform passkey, hybrid transport, or UVPAA support
 - `start_registration(input)` - Run browser registration and return `RegistrationResponseJSON`
 - `start_authentication(input)` - Run browser authentication and return `AuthenticationResponseJSON`
 - `cancel_ceremony()` - Abort an active browser WebAuthn ceremony
@@ -176,6 +178,17 @@ just test      # run tests
 
 - Only ES256 (P-256) signature verification implemented
 - Packed attestation verification not yet implemented (fmt="none" works)
+
+## Upstream tracking and mutation testing
+
+This update tracks selected features from SimpleWebAuthn v14.0.3: cross-origin
+authentication with `with_expected_top_origin()` / `with_expected_top_origins()`,
+and browser capability/passkey detection. See the [compatibility matrix and
+behavioral boundaries](docs/upstream.md) for implemented and pending features.
+
+The [turtles mutation gate](docs/mutation-testing.md) covers the new MoonBit
+top-origin and capability decisions on the JS target, with a pinned tool revision
+and reports retained by CI.
 
 ## License
 

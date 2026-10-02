@@ -199,6 +199,7 @@ pub struct VerifiedRegistration {
 pub struct VerifyAuthenticationOptions {
   expected_challenge : Bytes
   expected_origins : Array[String]
+  expected_top_origins : Array[String]?
   expected_rp_id : String
   expected_rp_ids : Array[String]?
   expected_types : Array[String]?
@@ -211,6 +212,8 @@ pub fn VerifyAuthenticationOptions::new(Bytes, String, String, AuthenticatorCred
 pub fn VerifyAuthenticationOptions::require_user_verification(Self, Bool) -> Self
 pub fn VerifyAuthenticationOptions::with_advanced_fido_user_verification(Self, @types.UserVerification) -> Self
 pub fn VerifyAuthenticationOptions::with_expected_rp_ids(Self, Array[String]) -> Self
+pub fn VerifyAuthenticationOptions::with_expected_top_origin(Self, String) -> Self
+pub fn VerifyAuthenticationOptions::with_expected_top_origins(Self, Array[String]) -> Self
 pub fn VerifyAuthenticationOptions::with_expected_types(Self, Array[String]) -> Self
 pub fn VerifyAuthenticationOptions::with_origins(Bytes, Array[String], String, AuthenticatorCredential) -> Self
 pub fn VerifyAuthenticationOptions::with_sign_count_policy(Self, SignCountPolicy) -> Self
