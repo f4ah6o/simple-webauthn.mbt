@@ -36,9 +36,9 @@ pub struct GenerateRegistrationOptionsInput {
   /// Authenticator selection criteria
   authenticator_selection : @types.AuthenticatorSelectionCriteria?
   /// Supported COSE algorithm identifiers (defaults to [-7, -257] for ES256, RS256)
-  supported_algorithm_ids : Array[Int]?
+  supported_algorithm_ids : Array[Int32]?
   /// Timeout in milliseconds (defaults to 60000)
-  timeout : Int?
+  timeout : Int32?
   /// UI hints for the browser
   hints : Array[@types.PublicKeyCredentialHint]?
   /// Encourage a specific authenticator class on supported browsers.
@@ -54,17 +54,17 @@ pub fn GenerateRegistrationOptionsInput::new(
   rp_name : String,
   rp_id : String,
   user_name : String,
-  user_id? : Bytes? = None,
-  user_display_name? : String? = None,
-  challenge? : Bytes? = None,
-  attestation? : @types.AttestationConveyance? = None,
-  exclude_credentials? : Array[@types.PublicKeyCredentialDescriptor]? = None,
-  authenticator_selection? : @types.AuthenticatorSelectionCriteria? = None,
-  supported_algorithm_ids? : Array[Int]? = None,
-  timeout? : Int? = None,
-  hints? : Array[@types.PublicKeyCredentialHint]? = None,
-  preferred_authenticator_type? : PreferredAuthenticatorType? = None,
-  extensions? : Json? = None,
+  user_id~ : Bytes? = None,
+  user_display_name~ : String? = None,
+  challenge~ : Bytes? = None,
+  attestation~ : @types.AttestationConveyance? = None,
+  exclude_credentials~ : Array[@types.PublicKeyCredentialDescriptor]? = None,
+  authenticator_selection~ : @types.AuthenticatorSelectionCriteria? = None,
+  supported_algorithm_ids~ : Array[Int32]? = None,
+  timeout~ : Int32? = None,
+  hints~ : Array[@types.PublicKeyCredentialHint]? = None,
+  preferred_authenticator_type~ : PreferredAuthenticatorType? = None,
+  extensions~ : Json? = None,
 ) -> GenerateRegistrationOptionsInput {
   {
     rp_name,
@@ -86,17 +86,17 @@ pub fn GenerateRegistrationOptionsInput::new(
 
 ///|
 /// Default values for registration options.
-let default_timeout : Int = 60000
+let default_timeout : Int32 = 60000
 
 ///|
-let default_challenge_length : Int = 32
+let default_challenge_length : Int32 = 32
 
 ///|
-let default_user_id_length : Int = 32
+let default_user_id_length : Int32 = 32
 
 ///|
 /// Default supported algorithms: EdDSA (-8), ES256 (-7), RS256 (-257)
-let default_algorithms : Array[Int] = [-8, -7, -257]
+let default_algorithms : Array[Int32] = [-8, -7, -257]
 
 ///|
 /// Generate random bytes using ChaCha8 PRNG.
@@ -110,7 +110,7 @@ let default_algorithms : Array[Int] = [-8, -7, -257]
 /// - Node.js: Use `crypto.randomBytes`
 /// 
 /// TODO: Implement platform-specific CSPRNG via FFI
-fn generate_random_bytes(length : Int) -> Bytes {
+fn generate_random_bytes(length : Int32) -> Bytes {
   // WARNING: This PRNG is not cryptographically secure without proper seeding!
   // In production, replace with platform's CSPRNG.
   let rng = @random.Rand::chacha8()

@@ -7,7 +7,7 @@ pub(all) enum COSEKeyType {
 } derive(Show, Eq)
 
 ///|
-pub fn COSEKeyType::to_int(self : COSEKeyType) -> Int {
+pub fn COSEKeyType::to_int(self : COSEKeyType) -> Int32 {
   match self {
     OKP => 1
     EC2 => 2
@@ -16,7 +16,7 @@ pub fn COSEKeyType::to_int(self : COSEKeyType) -> Int {
 }
 
 ///|
-pub fn COSEKeyType::from_int(n : Int) -> COSEKeyType? {
+pub fn COSEKeyType::from_int(n : Int32) -> COSEKeyType? {
   match n {
     1 => Some(OKP)
     2 => Some(EC2)
@@ -43,7 +43,7 @@ pub(all) enum COSEAlgorithm {
 } derive(Show, Eq)
 
 ///|
-pub fn COSEAlgorithm::to_int(self : COSEAlgorithm) -> Int {
+pub fn COSEAlgorithm::to_int(self : COSEAlgorithm) -> Int32 {
   match self {
     ES256 => -7
     EdDSA => -8
@@ -61,7 +61,7 @@ pub fn COSEAlgorithm::to_int(self : COSEAlgorithm) -> Int {
 }
 
 ///|
-pub fn COSEAlgorithm::from_int(n : Int) -> COSEAlgorithm? {
+pub fn COSEAlgorithm::from_int(n : Int32) -> COSEAlgorithm? {
   match n {
     -7 => Some(ES256)
     -8 => Some(EdDSA)
@@ -86,7 +86,7 @@ pub impl ToJson for COSEAlgorithm with fn to_json(self) {
 
 ///|
 pub impl FromJson for COSEAlgorithm with fn from_json(json, path) {
-  let n : Int = FromJson::from_json(json, path)
+  let n : Int32 = FromJson::from_json(json, path)
   match COSEAlgorithm::from_int(n) {
     Some(v) => v
     None => raise JsonDecodeError((path, "Invalid COSEAlgorithm"))
@@ -104,7 +104,7 @@ pub(all) enum COSECurve {
 } derive(Show, Eq)
 
 ///|
-pub fn COSECurve::to_int(self : COSECurve) -> Int {
+pub fn COSECurve::to_int(self : COSECurve) -> Int32 {
   match self {
     P256 => 1
     P384 => 2
@@ -115,7 +115,7 @@ pub fn COSECurve::to_int(self : COSECurve) -> Int {
 }
 
 ///|
-pub fn COSECurve::from_int(n : Int) -> COSECurve? {
+pub fn COSECurve::from_int(n : Int32) -> COSECurve? {
   match n {
     1 => Some(P256)
     2 => Some(P384)

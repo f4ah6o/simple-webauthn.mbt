@@ -117,9 +117,9 @@ pub struct VerifiedRegistration {
   /// The public key in COSE format (for signature verification)
   credential_public_key : Bytes
   /// The COSE algorithm identifier (e.g., -7 for ES256)
-  credential_algorithm : Int
+  credential_algorithm : Int32
   /// Signature counter (should be stored and checked on authentication)
-  sign_count : UInt
+  sign_count : UInt32
   /// Whether the credential is backup eligible (synced passkey)
   backup_eligible : Bool
   /// Whether the credential has been backed up

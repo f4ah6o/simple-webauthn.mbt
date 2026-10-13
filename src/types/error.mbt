@@ -22,7 +22,7 @@ pub(all) suberror WebAuthnError {
   /// User verification required but not performed
   UserVerificationRequired
   /// Counter too low (potential cloned authenticator)
-  CounterTooLow(expected~ : UInt, actual~ : UInt)
+  CounterTooLow(expected~ : UInt32, actual~ : UInt32)
   /// Unsupported attestation format
   UnsupportedAttestationFormat(String)
   /// Browser does not support WebAuthn
@@ -62,7 +62,7 @@ pub struct ParsedAuthenticatorData {
   /// Authenticator flags
   flags : AuthenticatorFlags
   /// Signature counter (32-bit big-endian)
-  counter : UInt
+  counter : UInt32
   /// AAGUID of the authenticator (16 bytes, only in attestation)
   aaguid : Bytes?
   /// Credential ID (only in attestation)
@@ -136,7 +136,7 @@ pub struct RegistrationInfo {
   /// Raw credential public key (COSE format)
   credential_public_key : Bytes
   /// Initial counter value
-  counter : UInt
+  counter : UInt32
   /// Device type (single/multi)
   credential_device_type : CredentialDeviceType
   /// Whether credential is backed up
@@ -162,7 +162,7 @@ pub struct AuthenticationInfo {
   /// Credential ID used
   credential_id : Bytes
   /// New counter value (should be stored)
-  new_counter : UInt
+  new_counter : UInt32
   /// Device type
   credential_device_type : CredentialDeviceType
   /// Whether credential is backed up

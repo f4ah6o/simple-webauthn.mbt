@@ -7,7 +7,7 @@
 ///|
 /// Error types for Base64URL operations.
 pub suberror Base64URLError {
-  InvalidChar(Int) // Position of invalid character
+  InvalidChar(Int32) // Position of invalid character
   InvalidPadding // Incorrect padding
   InvalidLength // Length not valid for base64
   DecodeFailed(String) // Generic decode failure with message

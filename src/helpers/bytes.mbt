@@ -4,13 +4,13 @@
 ///|
 /// Error types for byte operations.
 pub suberror BytesError {
-  OutOfBounds(Int, Int) // (requested_offset, actual_length)
-  InvalidLength(Int, Int) // (expected, actual)
+  OutOfBounds(Int32, Int32) // (requested_offset, actual_length)
+  InvalidLength(Int32, Int32) // (expected, actual)
 }
 
 ///|
 /// Read a big-endian UInt16 from bytes at the given offset.
-pub fn read_u16_be(bytes : Bytes, offset : Int) -> UInt raise BytesError {
+pub fn read_u16_be(bytes : Bytes, offset : Int32) -> UInt32 raise BytesError {
   if offset + 2 > bytes.length() {
     raise OutOfBounds(offset + 2, bytes.length())
   }
@@ -21,7 +21,7 @@ pub fn read_u16_be(bytes : Bytes, offset : Int) -> UInt raise BytesError {
 
 ///|
 /// Read a big-endian UInt32 from bytes at the given offset.
-pub fn read_u32_be(bytes : Bytes, offset : Int) -> UInt raise BytesError {
+pub fn read_u32_be(bytes : Bytes, offset : Int32) -> UInt32 raise BytesError {
   if offset + 4 > bytes.length() {
     raise OutOfBounds(offset + 4, bytes.length())
   }
@@ -34,7 +34,7 @@ pub fn read_u32_be(bytes : Bytes, offset : Int) -> UInt raise BytesError {
 
 ///|
 /// Read a big-endian UInt64 from bytes at the given offset.
-pub fn read_u64_be(bytes : Bytes, offset : Int) -> UInt64 raise BytesError {
+pub fn read_u64_be(bytes : Bytes, offset : Int32) -> UInt64 raise BytesError {
   if offset + 8 > bytes.length() {
     raise OutOfBounds(offset + 8, bytes.length())
   }
@@ -49,8 +49,8 @@ pub fn read_u64_be(bytes : Bytes, offset : Int) -> UInt64 raise BytesError {
 /// Slice bytes from offset with given length.
 pub fn bytes_slice(
   bytes : Bytes,
-  offset : Int,
-  len : Int,
+  offset : Int32,
+  len : Int32,
 ) -> Bytes raise BytesError {
   if offset + len > bytes.length() {
     raise OutOfBounds(offset + len, bytes.length())
@@ -63,7 +63,10 @@ pub fn bytes_slice(
 
 ///|
 /// Slice bytes from offset to end.
-pub fn bytes_slice_from(bytes : Bytes, offset : Int) -> Bytes raise BytesError {
+pub fn bytes_slice_from(
+  bytes : Bytes,
+  offset : Int32,
+) -> Bytes raise BytesError {
   if offset > bytes.length() {
     raise OutOfBounds(offset, bytes.length())
   }
@@ -94,7 +97,7 @@ pub fn constant_time_equal(a : Bytes, b : Bytes) -> Bool {
   if a.length() != b.length() {
     return false
   }
-  let mut result : Int = 0
+  let mut result : Int32 = 0
   for i = 0; i < a.length(); i = i + 1 {
     result = result | (a[i].to_int() ^ b[i].to_int())
   }
@@ -148,7 +151,7 @@ pub fn hex_to_bytes(hex : String) -> Bytes raise BytesError {
 }
 
 ///|
-fn hex_char_to_int(c : Int) -> Int {
+fn hex_char_to_int(c : Int32) -> Int32 {
   if c >= 0x30 && c <= 0x39 {
     // '0' - '9'
     c - 0x30

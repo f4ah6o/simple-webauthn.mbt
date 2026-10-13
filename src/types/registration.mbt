@@ -11,7 +11,7 @@ pub struct PublicKeyCredentialCreationOptionsJSON {
   /// Supported public key algorithms
   pub_key_cred_params : Array[PublicKeyCredentialParameters]
   /// Timeout in milliseconds
-  timeout : Int?
+  timeout : Int32?
   /// Credentials to exclude (prevent re-registration)
   exclude_credentials : Array[PublicKeyCredentialDescriptor]?
   /// Authenticator requirements
@@ -33,13 +33,13 @@ pub fn PublicKeyCredentialCreationOptionsJSON::new(
   user : PublicKeyCredentialUserEntity,
   challenge : Base64URLString,
   pub_key_cred_params : Array[PublicKeyCredentialParameters],
-  timeout? : Int? = None,
-  exclude_credentials? : Array[PublicKeyCredentialDescriptor]? = None,
-  authenticator_selection? : AuthenticatorSelectionCriteria? = None,
-  hints? : Array[PublicKeyCredentialHint]? = None,
-  attestation? : AttestationConveyance? = None,
-  attestation_formats? : Array[AttestationFormat]? = None,
-  extensions? : Json? = None,
+  timeout~ : Int32? = None,
+  exclude_credentials~ : Array[PublicKeyCredentialDescriptor]? = None,
+  authenticator_selection~ : AuthenticatorSelectionCriteria? = None,
+  hints~ : Array[PublicKeyCredentialHint]? = None,
+  attestation~ : AttestationConveyance? = None,
+  attestation_formats~ : Array[AttestationFormat]? = None,
+  extensions~ : Json? = None,
 ) -> PublicKeyCredentialCreationOptionsJSON {
   {
     rp,
@@ -117,7 +117,7 @@ pub impl FromJson for PublicKeyCredentialCreationOptionsJSON with fn from_json(
     obj["pubKeyCredParams"],
     path,
   )
-  let timeout : Int? = match obj.get("timeout") {
+  let timeout : Int32? = match obj.get("timeout") {
     Some(t) => Some(FromJson::from_json(t, path))
     None => None
   }

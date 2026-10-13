@@ -43,7 +43,7 @@ pub struct AuthenticatorCredential {
   /// The public key in COSE format (for signature verification)
   public_key : Bytes
   /// The current signature counter (0 initially, incremented on each use)
-  sign_count : UInt
+  sign_count : UInt32
 } derive(Show, Eq)
 
 ///|
@@ -51,7 +51,7 @@ pub struct AuthenticatorCredential {
 pub fn AuthenticatorCredential::new(
   credential_id : Bytes,
   public_key : Bytes,
-  sign_count : UInt,
+  sign_count : UInt32,
 ) -> AuthenticatorCredential {
   { credential_id, public_key, sign_count, }
 }
@@ -225,7 +225,7 @@ pub struct VerifiedAuthentication {
   /// The credential ID that was used
   credential_id : Bytes
   /// The new signature counter (should be stored in database)
-  new_sign_count : UInt
+  new_sign_count : UInt32
   /// Whether user verification was performed
   user_verified : Bool
   /// Whether the credential is backup eligible (synced passkey)
@@ -497,8 +497,8 @@ fn verify_signature(
 /// - AllowZero: both being 0 is allowed, otherwise must increase
 /// - Permissive: never fails (consider logging warnings externally)
 fn verify_sign_count(
-  new_count : UInt,
-  stored_count : UInt,
+  new_count : UInt32,
+  stored_count : UInt32,
   policy : SignCountPolicy,
 ) -> Unit raise AuthenticationVerifyError {
   match policy {

@@ -13,7 +13,7 @@ pub struct GenerateAuthenticationOptionsInput {
   /// ⚠️ See security warning in generate_random_bytes about CSPRNG.
   challenge : Bytes?
   /// Timeout in milliseconds (defaults to 60000)
-  timeout : Int?
+  timeout : Int32?
   /// Allowed credentials. If empty/None, allows any discoverable credential.
   allow_credentials : Array[@types.PublicKeyCredentialDescriptor]?
   /// User verification requirement (defaults to "preferred")
@@ -28,13 +28,13 @@ pub struct GenerateAuthenticationOptionsInput {
 /// Create a new GenerateAuthenticationOptionsInput.
 /// All fields are optional with sensible defaults.
 pub fn GenerateAuthenticationOptionsInput::new(
-  rp_id? : String? = None,
-  challenge? : Bytes? = None,
-  timeout? : Int? = None,
-  allow_credentials? : Array[@types.PublicKeyCredentialDescriptor]? = None,
-  user_verification? : @types.UserVerification? = None,
-  hints? : Array[@types.PublicKeyCredentialHint]? = None,
-  extensions? : Json? = None,
+  rp_id~ : String? = None,
+  challenge~ : Bytes? = None,
+  timeout~ : Int32? = None,
+  allow_credentials~ : Array[@types.PublicKeyCredentialDescriptor]? = None,
+  user_verification~ : @types.UserVerification? = None,
+  hints~ : Array[@types.PublicKeyCredentialHint]? = None,
+  extensions~ : Json? = None,
 ) -> GenerateAuthenticationOptionsInput {
   {
     rp_id,

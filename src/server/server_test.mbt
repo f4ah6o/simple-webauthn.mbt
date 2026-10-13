@@ -36,7 +36,7 @@ fn make_attestation_object_none(auth_data : Bytes) -> Bytes {
 fn make_auth_data(
   rp_id : String,
   flags : Byte,
-  sign_count : UInt,
+  sign_count : UInt32,
   credential_id : Bytes?,
   public_key_cbor : Bytes?,
 ) -> Bytes {
@@ -807,7 +807,7 @@ test "generate_authentication_options_json_output" {
 fn make_test_credential(
   cred_id : Bytes,
   public_key : Bytes,
-  sign_count : UInt,
+  sign_count : UInt32,
 ) -> @server.AuthenticatorCredential {
   @server.AuthenticatorCredential::new(cred_id, public_key, sign_count)
 }
@@ -818,7 +818,7 @@ fn make_test_credential(
 fn make_auth_data_assertion(
   rp_id : String,
   flags : Byte,
-  sign_count : UInt,
+  sign_count : UInt32,
 ) -> Bytes {
   let buf = @buffer.new()
   // rpIdHash: SHA-256 of rpId

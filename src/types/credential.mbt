@@ -3,7 +3,7 @@
 pub struct WebAuthnCredential {
   id : Base64URLString
   public_key : Bytes
-  counter : UInt
+  counter : UInt32
   transports : Array[AuthenticatorTransport]?
 } derive(Show, Eq)
 
@@ -16,7 +16,7 @@ pub struct RelyingParty {
 
 ///|
 /// Create a new RelyingParty.
-pub fn RelyingParty::new(name : String, id? : String? = None) -> RelyingParty {
+pub fn RelyingParty::new(name : String, id~ : String? = None) -> RelyingParty {
   { id, name, }
 }
 
@@ -109,7 +109,7 @@ pub struct PublicKeyCredentialDescriptor {
 /// Create a new PublicKeyCredentialDescriptor.
 pub fn PublicKeyCredentialDescriptor::new(
   id : Base64URLString,
-  transports? : Array[AuthenticatorTransport]? = None,
+  transports~ : Array[AuthenticatorTransport]? = None,
 ) -> PublicKeyCredentialDescriptor {
   { id, type_: PublicKeyCredentialType::PublicKey, transports, }
 }
