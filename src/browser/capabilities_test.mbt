@@ -2,8 +2,8 @@
 extern "js" fn ffi_test_install_capability_mock(
   capabilities_json : String,
   api_available : Bool,
-  platform_available : Int,
-  conditional_available : Int,
+  platform_available : Int32,
+  conditional_available : Int32,
 ) -> Unit =
   #| (capabilities_json, api_available, platform_available, conditional_available) => {
   #|   function PublicKeyCredentialMock() {}
@@ -50,11 +50,11 @@ extern "js" fn ffi_test_install_rejecting_capability_mock() -> Unit =
   #| };
 
 ///|
-extern "js" fn ffi_test_platform_fallback_calls() -> Int =
+extern "js" fn ffi_test_platform_fallback_calls() -> Int32 =
   #| () => globalThis.__simple_webauthn_mbt_capability_fallback_calls?.platform ?? 0;
 
 ///|
-extern "js" fn ffi_test_conditional_fallback_calls() -> Int =
+extern "js" fn ffi_test_conditional_fallback_calls() -> Int32 =
   #| () => globalThis.__simple_webauthn_mbt_capability_fallback_calls?.conditional ?? 0;
 
 ///|

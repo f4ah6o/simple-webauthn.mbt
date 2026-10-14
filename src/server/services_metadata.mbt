@@ -79,9 +79,9 @@ pub struct MetadataServiceInitializeOptions {
 
 ///|
 pub fn MetadataServiceInitializeOptions::new(
-  mds_servers? : Array[String]? = None,
-  statements? : Array[MetadataStatement]? = None,
-  verification_mode? : VerificationMode? = None,
+  mds_servers~ : Array[String]? = None,
+  statements~ : Array[MetadataStatement]? = None,
+  verification_mode~ : VerificationMode? = None,
 ) -> MetadataServiceInitializeOptions {
   { mds_servers, statements, verification_mode, }
 }
@@ -154,7 +154,7 @@ let default_mds_server : String = "https://mds.fidoalliance.org/"
 ///
 /// Local statements are always loaded first, then MDS servers are fetched.
 pub async fn metadata_service_initialize(
-  options? : MetadataServiceInitializeOptions? = None,
+  options~ : MetadataServiceInitializeOptions? = None,
 ) -> Result[Unit, MetadataServiceError] {
   let resolved = match options {
     Some(v) => v

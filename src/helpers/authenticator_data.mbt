@@ -11,7 +11,7 @@
 ///|
 /// Error types for AuthenticatorData parsing.
 pub suberror AuthenticatorDataError {
-  TooShort(Int, Int) // (expected_min, actual)
+  TooShort(Int32, Int32) // (expected_min, actual)
   InvalidFlags(Byte)
   InvalidAAGUID
   InvalidCredentialId
@@ -69,7 +69,7 @@ pub struct AttestedCredentialData {
   /// COSE-encoded public key (raw bytes)
   credential_public_key : Bytes
   /// Length of the attested credential data section
-  length : Int
+  length : Int32
 } derive(Show, Eq)
 
 ///|
@@ -80,18 +80,18 @@ pub struct AuthenticatorData {
   /// Authentication flags
   flags : AuthFlags
   /// Signature counter (for replay attack detection)
-  sign_count : UInt
+  sign_count : UInt32
   /// Attested credential data (only present if AT flag is set)
   attested_credential_data : AttestedCredentialData?
   /// Extension data (raw CBOR bytes, only present if ED flag is set)
   extensions : Bytes?
   /// Total length of parsed data
-  length : Int
+  length : Int32
 } derive(Show, Eq)
 
 ///|
 /// Minimum length of authenticator data (rpIdHash + flags + signCount).
-let min_auth_data_length : Int = 32 + 1 + 4 // 37 bytes
+let min_auth_data_length : Int32 = 32 + 1 + 4 // 37 bytes
 
 ///|
 /// Parse authenticator data from bytes.
@@ -145,7 +145,7 @@ pub fn parse_authenticator_data(
 /// Parse attested credential data from bytes at the given offset.
 fn parse_attested_credential_data(
   data : Bytes,
-  offset : Int,
+  offset : Int32,
 ) -> AttestedCredentialData raise AuthenticatorDataError {
   // AAGUID (16 bytes)
   if offset + 16 > data.length() {
@@ -190,7 +190,7 @@ fn parse_attested_credential_data(
 ///|
 /// Estimate the length of a CBOR-encoded value.
 /// This is needed because CBOR is self-delimiting.
-fn get_cbor_length(data : Bytes) -> Int raise AuthenticatorDataError {
+fn get_cbor_length(data : Bytes) -> Int32 raise AuthenticatorDataError {
   // Try to decode and see how much we consumed
   // For COSE keys, we expect a map at the root
   let result = @cbor.decode(data) catch {

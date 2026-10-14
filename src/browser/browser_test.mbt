@@ -101,7 +101,7 @@ extern "js" fn ffi_test_install_authentication_mock() -> Unit =
   #| }
 
 ///|
-extern "js" fn ffi_test_set_document_inputs(count : Int) -> Unit =
+extern "js" fn ffi_test_set_document_inputs(count : Int32) -> Unit =
   #| (count) => {
   #|   globalThis.document = {
   #|     querySelectorAll: () => Array.from({ length: count }, () => ({})),

@@ -7,7 +7,7 @@ pub struct StartRegistrationInput {
 ///|
 pub fn StartRegistrationInput::new(
   options_json : @types.PublicKeyCredentialCreationOptionsJSON,
-  use_auto_register? : Bool = false,
+  use_auto_register~ : Bool = false,
 ) -> StartRegistrationInput {
   { options_json, use_auto_register, }
 }

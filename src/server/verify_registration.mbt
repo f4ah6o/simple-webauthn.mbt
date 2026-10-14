@@ -219,7 +219,7 @@ fn verify_authenticator_data(
 /// Extract credential data from authenticatorData.
 fn extract_credential_data(
   auth_data : @helpers.AuthenticatorData,
-) -> (Bytes, Bytes, Int) raise RegistrationVerifyError {
+) -> (Bytes, Bytes, Int32) raise RegistrationVerifyError {
   // Get attested credential data (already verified AT flag is set)
   let acd = match auth_data.attested_credential_data {
     Some(data) => data
@@ -427,7 +427,7 @@ fn att_stmt_get_bytes(
 fn att_stmt_get_int(
   entries : Array[(@cbor.CborValue, @cbor.CborValue)],
   key_name : String,
-) -> Int? {
+) -> Int32? {
   for entry in entries {
     let (key, value) = entry
     guard key is @cbor.CborValue::VString(s) else { continue }

@@ -21,7 +21,7 @@ pub suberror ECDSAError {
   InvalidPublicKey(String)
   InvalidSignature(String)
   VerificationFailed(String)
-  UnsupportedAlgorithm(Int)
+  UnsupportedAlgorithm(Int32)
 }
 
 ///|
@@ -32,14 +32,14 @@ pub struct EC2PublicKey {
   /// Y coordinate (32 bytes for P-256)
   y : Bytes
   /// COSE algorithm (-7 for ES256)
-  alg : Int
+  alg : Int32
 } derive(Show, Eq)
 
 ///|
 /// Create a new EC2 public key from coordinates.
 /// 
 /// For P-256 (ES256), both x and y must be 32 bytes.
-pub fn EC2PublicKey::new(x : Bytes, y : Bytes, alg : Int) -> EC2PublicKey {
+pub fn EC2PublicKey::new(x : Bytes, y : Bytes, alg : Int32) -> EC2PublicKey {
   { x, y, alg, }
 }
 
@@ -222,7 +222,7 @@ fn parse_der_signature(der : Bytes) -> Bytes raise ECDSAError {
 
 ///|
 /// Normalize an integer to a fixed length (remove leading zeros or pad).
-fn normalize_integer(bytes : Bytes, target_len : Int) -> Bytes {
+fn normalize_integer(bytes : Bytes, target_len : Int32) -> Bytes {
   let len = bytes.length()
   if len == target_len {
     return bytes
@@ -330,12 +330,12 @@ pub fn to_uncompressed_public_key(key : EC2PublicKey) -> Bytes {
 
 ///|
 /// Get the COSE algorithm identifier for ES256.
-pub fn es256_algorithm() -> Int {
+pub fn es256_algorithm() -> Int32 {
   -7
 }
 
 ///|
 /// Check if a COSE algorithm is ES256.
-pub fn is_es256(alg : Int) -> Bool {
+pub fn is_es256(alg : Int32) -> Bool {
   alg == -7
 }

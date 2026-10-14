@@ -128,7 +128,7 @@ pub fn encode_int(value : Int64) -> Bytes {
 
 ///|
 /// Internal: encode uint with known size using Bytes::makei
-fn encode_uint_internal(major : Int, value : UInt64) -> Bytes {
+fn encode_uint_internal(major : Int32, value : UInt64) -> Bytes {
   let major_shifted = (major << 5).to_byte()
   if value < 24UL {
     let b0 = major_shifted | value.to_byte()
@@ -304,10 +304,10 @@ pub fn encode_string(value : String) -> Bytes {
 /// Write CBOR header to FixedArray, returns new position
 fn write_header(
   buf : FixedArray[Byte],
-  pos : Int,
-  major : Int,
+  pos : Int32,
+  major : Int32,
   value : UInt64,
-) -> Int {
+) -> Int32 {
   let major_shifted = (major << 5).to_byte()
   if value < 24UL {
     buf[pos] = major_shifted | value.to_byte()
@@ -348,7 +348,11 @@ pub fn decode_string(input : Bytes) -> String raise CborError {
 
 ///|
 /// Optimized UTF-8 decoding - processes 4 ASCII bytes at once when possible
-fn utf8_to_string_optimized(bytes : Bytes, start : Int, len : Int) -> String {
+fn utf8_to_string_optimized(
+  bytes : Bytes,
+  start : Int32,
+  len : Int32,
+) -> String {
   let buf = StringBuilder(size_hint=len)
   let end = start + len
   let mut i = start
@@ -467,8 +471,8 @@ pub fn encode_null() -> Bytes {
 /// Decode CBOR head, returns (major_type, value, bytes_consumed)
 fn decode_head(
   input : Bytes,
-  offset : Int,
-) -> (Int, UInt64, Int) raise CborError {
+  offset : Int32,
+) -> (Int32, UInt64, Int32) raise CborError {
   if offset >= input.length() {
     raise CborError("Unexpected end of input")
   }
@@ -588,8 +592,8 @@ pub fn decode(input : Bytes) -> CborValue raise CborError {
 /// Internal: decode CBOR value at given offset, returns (value, bytes_consumed)
 fn decode_value(
   input : Bytes,
-  offset : Int,
-) -> (CborValue, Int) raise CborError {
+  offset : Int32,
+) -> (CborValue, Int32) raise CborError {
   let (major, value, new_offset) = decode_head(input, offset)
   match major {
     // Major type 0: unsigned integer

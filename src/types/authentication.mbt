@@ -5,7 +5,7 @@ pub struct PublicKeyCredentialRequestOptionsJSON {
   /// Challenge (Base64URL-encoded)
   challenge : Base64URLString
   /// Timeout in milliseconds
-  timeout : Int?
+  timeout : Int32?
   /// Relying party ID (domain)
   rp_id : String?
   /// Allowed credentials (if empty, allows any discoverable credential)
@@ -22,12 +22,12 @@ pub struct PublicKeyCredentialRequestOptionsJSON {
 /// Create a new PublicKeyCredentialRequestOptionsJSON.
 pub fn PublicKeyCredentialRequestOptionsJSON::new(
   challenge : Base64URLString,
-  timeout? : Int? = None,
-  rp_id? : String? = None,
-  allow_credentials? : Array[PublicKeyCredentialDescriptor]? = None,
-  user_verification? : UserVerification? = None,
-  hints? : Array[PublicKeyCredentialHint]? = None,
-  extensions? : Json? = None,
+  timeout~ : Int32? = None,
+  rp_id~ : String? = None,
+  allow_credentials~ : Array[PublicKeyCredentialDescriptor]? = None,
+  user_verification~ : UserVerification? = None,
+  hints~ : Array[PublicKeyCredentialHint]? = None,
+  extensions~ : Json? = None,
 ) -> PublicKeyCredentialRequestOptionsJSON {
   {
     challenge,
@@ -82,7 +82,7 @@ pub impl FromJson for PublicKeyCredentialRequestOptionsJSON with fn from_json(
     )
   }
   let challenge : Base64URLString = FromJson::from_json(obj["challenge"], path)
-  let timeout : Int? = match obj.get("timeout") {
+  let timeout : Int32? = match obj.get("timeout") {
     Some(t) => Some(FromJson::from_json(t, path))
     None => None
   }

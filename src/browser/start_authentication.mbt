@@ -8,8 +8,8 @@ pub struct StartAuthenticationInput {
 ///|
 pub fn StartAuthenticationInput::new(
   options_json : @types.PublicKeyCredentialRequestOptionsJSON,
-  use_browser_autofill? : Bool = false,
-  verify_browser_autofill_input? : Bool = true,
+  use_browser_autofill~ : Bool = false,
+  verify_browser_autofill_input~ : Bool = true,
 ) -> StartAuthenticationInput {
   { options_json, use_browser_autofill, verify_browser_autofill_input, }
 }
