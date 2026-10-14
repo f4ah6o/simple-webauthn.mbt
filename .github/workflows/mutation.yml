@@ -27,7 +27,7 @@ jobs:
       - name: Resolve dependencies
         run: moon update
       - name: Install pinned turtles
-        run: moon install https://github.com/f4ah6o/turtles.git cmd/turtles --rev 4d9baaa258c695e803a487283076e979e2c260ba
+        run: moon install https://github.com/f4ah6o/turtles.git cmd/turtles --rev a3a414868151a7bcf753bb34ad60be3233766a46
       - name: Run JS mutation gate
         run: turtles --dir . --target js --jobs 2 --fail-under 100 --json .turtles/report.json
       - name: Verify campaign covers both policy files
